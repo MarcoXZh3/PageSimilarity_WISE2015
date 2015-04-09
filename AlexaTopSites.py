@@ -3,7 +3,7 @@ Created on Mar 28, 2015
 
 @author: MarcoXZh
 '''
-import requests, urllib2, httplib, sqlite3, os
+import requests, urllib2, sqlite3, os, re
 from urlparse import urlparse
 from lxml import html
 
@@ -142,6 +142,16 @@ if __name__ == "__main__":
   # for url in urls
   """
 
+  # Django's validator
+  # https://github.com/django/django/blob/master/django/core/validators.py
+  urlPattern = re.compile(
+    r'^(?:http|ftp)s?://'                                                                 # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'localhost|'                                                                         # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'                                                # ...or ipv4
+    r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'                                                        # ...or ipv6
+    r'(?::\d+)?'                                                                          # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
   # Step 5: remove invalid URLs
   c1.execute("SELECT count(*) FROM pages2_150330;")
   numbers = c1.fetchone()[0]
@@ -152,17 +162,13 @@ if __name__ == "__main__":
     c1.execute("SELECT * FROM pages2_150330 WHERE number > %d AND number <= %d;" % (i * step, (i + 1) * step))
     urls = c1.fetchall()
     for url in urls:
-      try:
-        urllib2.urlopen(url[1])
-      except Exception as e:
+      if not re.match(urlPattern, url[1]):
         c1.execute("DELETE FROM pages2_150330 WHERE number = %d;" % url[0])
-        print "    %8d/%d: %s - %s -- %s" % (url[0], numbers, type(e).__name__, e.args, url[1])
+        print "    %8d/%d: %s" % (url[0], numbers, repr(url[1]))
     # for url in urls
     conn1.commit()
   # for i in range(0, end)
   print "Original records: %d" % numbers
   print "Current records : %d" % c1.execute("SELECT count(*) FROM pages2_150330;").fetchone()[0]
-
-
 
 # if __name__ == "__main__"
