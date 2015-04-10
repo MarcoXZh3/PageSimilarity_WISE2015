@@ -51,6 +51,86 @@ def getTopSites(number):
   conn.commit()
 # def getTopSites(number)
 
+def crawlPagesLevel1(pageExts):
+  conn = sqlite3.connect("databases/webpages.db")
+  c = conn.cursor()
+  c.execute("CREATE TABLE pages1_150328 (number int primary key, url text);")
+  c.execute("SELECT * FROM pages0_150327;")
+  urls = c.fetchall()
+  lenURLs = len(urls)
+  index = 1
+  for url in urls:
+    resultSet = set()
+    try:
+      resultSet = crawlPage(url[2], pageExts)
+    except:
+      continue
+    rows = []
+    for rs in resultSet:
+      rows.append((index, rs))
+      index += 1
+    c.executemany('INSERT INTO pages1_150328 VALUES (?, ?)', rows)
+    conn.commit()
+    print "%5d/%d: %s" % (index, lenURLs, url[2])
+  # for url in urls
+# def crawlPagesLevel1(pageExts)
+
+def crawlPagesLevel2(pageExts):
+  conn = sqlite3.connect("databases/webpages.db")
+  c = conn.cursor()
+  conn1 = sqlite3.connect("databases/webpages1.db")
+  c1 = conn1.cursor()
+  c1.execute("CREATE TABLE pages2_150330 (number int primary key, url text);")
+  c.execute("SELECT * FROM pages1_150328;")
+  urls = c.fetchall()
+  lenURLs = len(urls)
+  '''
+  Exception 1: pages1_150328<number=15185>, pages2_150330<number= 2,992,609> ~~ terminated;
+  Exception 2: pages1_150328<number=44778>, pages2_150330<number= 8,737,160> ~~ non-respond;
+  Exception 3: pages1_150328<number=44779>, pages2_150330<number= 8,737,160> ~~ non-respond;
+  Exception 4: pages1_150328<number=55458>, pages2_150330<number=10,812,860> ~~ non-respond;
+  Exception 5: pages1_150328<number=55459>, pages2_150330<number=10,812,860> ~~ non-respond;
+  Exception 6: pages1_150328<number=57388>, pages2_150330<number=11,181,762> ~~ terminated;
+  Exception 7: pages1_150328<number=57389>, pages2_150330<number=11,181,762> ~~ terminated;
+  '''
+  index = 1
+  urlIndex = 1
+  for url in urls:
+    resultSet = crawlPage(url[1], pageExts)
+    rows = []
+    for rs in resultSet:
+      rows.append((index, rs))
+      index += 1
+    if len(rows) != 0:
+      c1.executemany('INSERT INTO pages2_150330 VALUES (?, ?)', rows)
+      conn1.commit()
+    print "%5d/%d: %s" % (urlIndex, lenURLs, url[1])
+    urlIndex += 1
+  # for url in urls
+# def crawlPagesLevel2(pageExts)
+
+def removeInvalid(table, urlPattern):
+  conn = sqlite3.connect("databases/webpages.db")
+  c = conn.cursor()
+  c.execute("SELECT count(*) FROM %s;" % table)
+  numbers = c.fetchone()[0]
+  step = 4096
+  end = numbers / step + 1 if numbers % step != 0 else numbers / step
+  for i in range(0, end):
+    print "%4d/%d: Remove invalid URL" % (i, end)
+    c.execute("SELECT * FROM %s WHERE number > %d AND number <= %d;" % (table, i * step, (i + 1) * step))
+    urls = c.fetchall()
+    for url in urls:
+      if not re.match(urlPattern, url[1]):
+        c.execute("DELETE FROM %s WHERE number = %d;" % (table, url[0]))
+        print "    %8d/%d: %s" % (url[0], numbers, repr(url[1]))
+    # for url in urls
+    conn.commit()
+  # for i in range(0, end)
+  print "Original records: %d" % numbers
+  print "Current records : %d" % c.execute("SELECT count(*) FROM %s;" % table).fetchone()[0]
+#def removeInvalid(table, urlPattern)
+
 def crawlPage(url, pageExts):
   try:
     results = set()
@@ -76,72 +156,7 @@ def crawlPage(url, pageExts):
 # def crawlPage(url, pageExts)
 
 if __name__ == "__main__":
-  # Step 1: retrieve the top 500 top sites
-  #getTopSites(500)
-
-  # Step 2(Manually): remove improper sites and mark duplications
-
-  """
   pageExts = [".html", ".htm", ".php", ".jsp", ".asp", ".aspx", ".c", ".srf", ""]
-  conn = sqlite3.connect("databases/webpages.db")
-  c = conn.cursor()
-  # Stop 3: Crawl all direct links from the top 500 sites - Level 1
-  '''
-  c.execute("CREATE TABLE pages1_150328 (number int primary key, url text);")
-  c.execute("SELECT * FROM pages0_150327;")
-  urls = c.fetchall()
-  lenURLs = len(urls)
-  index = 1
-  for url in urls:
-    resultSet = set()
-    try:
-      resultSet = crawlPage(url[2], pageExts)
-    except:
-      continue
-    rows = []
-    for rs in resultSet:
-      rows.append((index, rs))
-      index += 1
-    c.executemany('INSERT INTO pages1_150328 VALUES (?, ?)', rows)
-    conn.commit()
-    print "%5d/%d: %s" % (index, lenURLs, url[2])
-  # for url in urls
-  '''
-
-  """
-  # Step 4: Crawl all direct links from previous links - Level 2
-  conn1 = sqlite3.connect("databases/webpages1.db")
-  c1 = conn1.cursor()
-  """
-  #c1.execute("CREATE TABLE pages2_150330 (number int primary key, url text);")
-  c.execute("SELECT * FROM pages1_150328;")
-  urls = c.fetchall()
-  lenURLs = len(urls)
-  '''
-  Exception 1: pages1_150328<number=15185>, pages2_150330<number=2,992,609> ~~ terminated;
-  Exception 2: pages1_150328<number=44778>, pages2_150330<number=8,737,160> ~~ non-respond;
-  Exception 3: pages1_150328<number=44779>, pages2_150330<number=8,737,160> ~~ non-respond;
-  Exception 4: pages1_150328<number=55458>, pages2_150330<number=10,812,860> ~~ non-respond;
-  Exception 5: pages1_150328<number=55459>, pages2_150330<number=10,812,860> ~~ non-respond;
-  Exception 6: pages1_150328<number=57388>, pages2_150330<number=11,181,762> ~~ terminated;
-  Exception 7: pages1_150328<number=57389>, pages2_150330<number=11,181,762> ~~ terminated;
-  '''
-  index = 1
-  urlIndex = 1
-  for url in urls:
-    resultSet = crawlPage(url[1], pageExts)
-    rows = []
-    for rs in resultSet:
-      rows.append((index, rs))
-      index += 1
-    if len(rows) != 0:
-      c1.executemany('INSERT INTO pages2_150330 VALUES (?, ?)', rows)
-      conn1.commit()
-    print "%5d/%d: %s" % (urlIndex, lenURLs, url[1])
-    urlIndex += 1
-  # for url in urls
-  """
-
   # Django's validator
   # https://github.com/django/django/blob/master/django/core/validators.py
   urlPattern = re.compile(
@@ -152,23 +167,22 @@ if __name__ == "__main__":
     r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'                                                        # ...or ipv6
     r'(?::\d+)?'                                                                          # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+  # Step 1: retrieve the top 500 top sites
+  #getTopSites(500)
+
+  # Step 2(Manually): remove improper sites and mark duplications
+
+  # Stop 3: Crawl all direct links from the top 500 sites - Level 1
+  #crawlPagesLevel1(pageExts)
+
+  # Step 4: Crawl all direct links from previous links - Level 2
+  #crawlPagesLevel1(pageExts)
+
   # Step 5: remove invalid URLs
-  c1.execute("SELECT count(*) FROM pages2_150330;")
-  numbers = c1.fetchone()[0]
-  step = 4096
-  end = numbers / step + 1 if numbers % step != 0 else numbers / step
-  for i in range(0, end):
-    print "%4d / %d" % (i, end)
-    c1.execute("SELECT * FROM pages2_150330 WHERE number > %d AND number <= %d;" % (i * step, (i + 1) * step))
-    urls = c1.fetchall()
-    for url in urls:
-      if not re.match(urlPattern, url[1]):
-        c1.execute("DELETE FROM pages2_150330 WHERE number = %d;" % url[0])
-        print "    %8d/%d: %s" % (url[0], numbers, repr(url[1]))
-    # for url in urls
-    conn1.commit()
-  # for i in range(0, end)
-  print "Original records: %d" % numbers
-  print "Current records : %d" % c1.execute("SELECT count(*) FROM pages2_150330;").fetchone()[0]
+  #removeInvalid("pages1_150328", urlPattern)
+  #removeInvalid("pages2_150330", urlPattern)
+
+  # Step 6: update records' indexes
 
 # if __name__ == "__main__"
