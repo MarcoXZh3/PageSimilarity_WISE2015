@@ -134,7 +134,7 @@ def removeInvalid(table, urlPattern):
 def updateIndex(table):
   conn = sqlite3.connect("databases/webpages.db")
   c = conn.cursor()
-  c.execute("SELECT count(*) FROM %s;" % table)
+  c.execute("SELECT * FROM %s ORDER BY number DESC LIMIT 1;" % table)
   numbers = c.fetchone()[0]
   step = 4096
   end = numbers / step + 1 if numbers % step != 0 else numbers / step
@@ -207,6 +207,7 @@ if __name__ == "__main__":
   #removeInvalid("pages2_150330", urlPattern)
 
   # Step 6: update records' indexes
+  updateIndex("pages0_150327")
   #updateIndex("pages1_150328")
-  updateIndex("pages2_150330")
+  #updateIndex("pages2_150330")
 # if __name__ == "__main__"
