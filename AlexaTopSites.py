@@ -131,6 +131,29 @@ def removeInvalid(table, urlPattern):
   print "Current records : %d" % c.execute("SELECT count(*) FROM %s;" % table).fetchone()[0]
 #def removeInvalid(table, urlPattern)
 
+def updateIndex(table):
+  conn = sqlite3.connect("databases/webpages.db")
+  c = conn.cursor()
+  c.execute("SELECT count(*) FROM %s;" % table)
+  numbers = c.fetchone()[0]
+  step = 4096
+  end = numbers / step + 1 if numbers % step != 0 else numbers / step
+  index = 1
+  for i in range(0, end):
+    print "%4d/%d: Update index" % (i, end)
+    c.execute("SELECT * FROM %s WHERE number > %d AND number <= %d;" % (table, i * step, (i + 1) * step))
+    urls = c.fetchall()
+    for url in urls:
+      if url[0] != index:
+        c.execute("UPDATE %s SET number=%d WHERE number=%d" % (table, index, url[0]))
+        #print "    %8d/%d: => %8d, %s" % (url[0], numbers, index, repr(url[1]))
+      # if url[0] != index
+      index += 1
+    # for url in urls
+    conn.commit()
+  # for i in range(0, end)
+# def updateIndex(table)
+
 def crawlPage(url, pageExts):
   try:
     results = set()
@@ -184,5 +207,6 @@ if __name__ == "__main__":
   #removeInvalid("pages2_150330", urlPattern)
 
   # Step 6: update records' indexes
-
+  #updateIndex("pages1_150328")
+  updateIndex("pages2_150330")
 # if __name__ == "__main__"
