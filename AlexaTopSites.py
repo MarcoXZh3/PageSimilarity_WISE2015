@@ -207,7 +207,7 @@ if __name__ == "__main__":
   #removeInvalid("pages2_150330", urlPattern)
 
   # Step 6: update records' indexes
-  updateIndex("pages0_150327")
+  #updateIndex("pages0_150327")
   #updateIndex("pages1_150328")
   #updateIndex("pages2_150330")
 # if __name__ == "__main__"
