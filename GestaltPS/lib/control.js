@@ -1,17 +1,28 @@
 const {Cc, Ci} = require("chrome");
 const data = require("sdk/self").data;
+const { Hotkey } = require("sdk/hotkeys");
 
 const register = (panel) => {
   panel.port.on("click-LI-similarity", function() { GestaltPS_Handler(panel, "handler-LI-similarity"); });
+  Hotkey({combo: "control-alt-s", onPress: function() { GestaltPS_Handler(panel, "handler-LI-similarity"); }});
   panel.port.on("click-LI-layertree", function() { GestaltPS_Handler(panel, "handler-LI-layertree"); });
+  Hotkey({combo: "control-alt-l", onPress: function() { GestaltPS_Handler(panel, "handler-LI-layertree"); }});
   panel.port.on("click-LI-blocktree", function() { GestaltPS_Handler(panel, "handler-LI-blocktree"); });
+  Hotkey({combo: "control-alt-b", onPress: function() { GestaltPS_Handler(panel, "handler-LI-blocktree"); }});
   panel.port.on("click-LI-glmall", function() { GestaltPS_Handler(panel, "handler-LI-glmall"); });
+  Hotkey({combo: "control-alt-a", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmall"); }});
   panel.port.on("click-LI-glmprox", function() { GestaltPS_Handler(panel, "handler-LI-glmprox"); });
+  Hotkey({combo: "control-alt-p", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmprox"); }});
   panel.port.on("click-LI-glmsimbg", function() { GestaltPS_Handler(panel, "handler-LI-glmsimbg"); });
+  Hotkey({combo: "control-alt-g", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmsimbg"); }});
   panel.port.on("click-LI-glmsimtxt", function() { GestaltPS_Handler(panel, "handler-LI-glmsimtxt"); });
+  Hotkey({combo: "control-alt-t", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmsimtxt"); }});
   panel.port.on("click-LI-glmsimsz", function() { GestaltPS_Handler(panel, "handler-LI-glmsimsz"); });
+  Hotkey({combo: "control-alt-z", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmsimsz"); }});
   panel.port.on("click-LI-glmcomf", function() { GestaltPS_Handler(panel, "handler-LI-glmcomf"); });
+  Hotkey({combo: "control-alt-f", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcomf"); }});
   panel.port.on("click-LI-glmcon", function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); });
+  Hotkey({combo: "control-alt-c", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); }});
 }; // const register = (panel) => { ... };
 
 /*const prefs = Cc["@mozilla.org/preferences-service;1"].
