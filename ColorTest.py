@@ -1,4 +1,9 @@
 '''
+http://www.brucelindbloom.com/index.html?Math.html
+http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE2000.html
+RGB is sRGB
+Illuminant D65: xr = 95.047, yr = 100.000, zr = 108.883
+
 Created on Mar 13, 2015
 @author: MarcoXZh
 '''
@@ -74,6 +79,51 @@ def LABtoXYZ(lab):
   return [x * xyz_D65[0], y * xyz_D65[1], z * xyz_D65[2]]
 # def LABtoXYZ(lab)
 '''
+
+def deltaE2000(lab1, lab2):
+    assert len(lab1) == 3 and len(lab2) == 3
+
+    l_avg = (lab1[0] + lab2[0]) / 2.0
+    l_delta_p = lab2[0] - lab1[0]
+    s_l = math.pow(l_avg - 50.0, 2.0)
+    s_l = 1.0 + (0.015 * s_l) / (math.sqrt(20.0 + s_l))
+    c1 = math.sqrt(lab1[1] * lab1[1] + lab1[2] * lab1[2])
+    c2 = math.sqrt(lab2[1] * lab2[1] + lab2[2] * lab2[2])
+    c_avg = math.pow((c1 + c2) / 2.0, 7.0)
+    g = (1.0 - math.sqrt(c_avg / (c_avg + math.pow(25.0, 7.0)))) / 2.0
+    lab1[1] *= (1.0 + g)
+    lab2[1] *= (1.0 + g)
+    c1 = math.sqrt(lab1[1] * lab1[1] + lab1[2] * lab1[2])
+    c2 = math.sqrt(lab2[1] * lab2[1] + lab2[2] * lab2[2])
+    c_avg = (c1 + c2) / 2.0
+    c_delta_p = c2 - c1
+    s_c = 1.0 + 0.045 * c_avg
+    h1 = math.atan2(lab1[2], lab1[1]) / math.pi * 180.0
+    if h1 < 0.0:
+        h1 += 360.0
+    h2 = math.atan2(lab2[2], lab2[1]) / math.pi * 180.0
+    if h2 < 0.0:
+        h2 += 360.0
+    h_delta = h2 - h1
+    h_avg = (h1 + h2) / 2.0
+    if math.fabs(h_delta) > 180.0:
+        h_delta = h_delta - 360.0 if h2 > h1 else h_delta + 360.0
+        h_avg += 180.0
+    # if math.fabs(h_delta) > 180.0
+    t = 1.0 - 0.17 * math.cos((h_avg - 30.0) / 180.0 * math.pi) \
+            + 0.24 * math.cos((2.0 * h_avg) / 180.0 * math.pi) \
+            + 0.32 * math.cos((3.0 * h_avg + 6.0) / 180.0 * math.pi) \
+            - 0.20 * math.cos((4.0 * h_avg - 63.0) / 180.0 * math.pi)
+    h_delta_p = 2.0 * math.sqrt(c1 * c2) * math.sin(h_delta / 360.0 * math.pi)
+    s_h = 1.0 + 0.0015 * c_avg * t
+    theta_delta = 30.0 * math.exp(-1.0 * math.pow((h_avg - 275) / 25.0, 2.0))
+    c_avg = math.pow(c_avg, 7.0)
+    r_c = 2.0 * math.sqrt(c_avg / (c_avg + math.pow(25.0, 7.0)))
+    r_t = -1.0 * r_c * math.sin(2.0 * theta_delta / 180.0 * math.pi)
+    deltaE = math.sqrt(math.pow(l_delta_p / s_l, 2.0) + math.pow(c_delta_p / s_c, 2.0) + \
+                       math.pow(h_delta_p / s_h, 2.0) + r_t * (c_delta_p / s_c) * (h_delta_p / s_h))
+    return deltaE
+# def deltaE2000(lab1, lab2)
 
 if __name__ == '__main__':
   conn = sqlite3.connect("databases/colorTest.db")
