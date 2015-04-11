@@ -45,8 +45,9 @@ self.port.on("handler-LI-layertree", function(startTime) {
  */
 self.port.on("handler-LI-blocktree", function(startTime) {
   var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  var blockTree = new BlockTree(new BlockTreeNode([document.body], "/"), document.URL);
+  var blockTree = new BlockTree(new BlockTreeNode([layerTree.root], "/0"), document.URL);
   blockTree.buildUpTree(layerTree);
+  //blockTree.treeInPage();
   self.port.emit("resp-LI-blocktree", new Date().getTime() - startTime, blockTree.toString());
 }); // self.port.on("handler-LI-blocktree", function(startTime) {...});
 
@@ -54,55 +55,69 @@ self.port.on("handler-LI-blocktree", function(startTime) {
  * Register event handlers of the menu item - "GLM - All Laws"
  */
 self.port.on("handler-LI-glmall", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getAllLaws(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getAllLaws(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+             mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmall", function(startTime) {...});
 
 /**
  * Register event handlers of the menu item - "GLM - Proximity"
  */
 self.port.on("handler-LI-glmprox", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getProximity(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getProximity(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+               mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmprox", function(startTime) {...});
 
 /**
  * Register event handlers of the menu item - "GLM - Similarity (Bg)"
  */
 self.port.on("handler-LI-glmsimbg", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getSimBg(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getSimBg(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+           mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmsimbg", function(startTime) {...});
 
 /**
  * Register event handlers of the menu item - "GLM - Similarity (Text)"
  */
 self.port.on("handler-LI-glmsimtxt", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getSimTxt(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getSimTxt(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+            mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmsimtxt", function(startTime) {...});
 
 /**
  * Register event handlers of the menu item - "GLM - Similarity (Size)"
  */
 self.port.on("handler-LI-glmsimsz", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getSimSz(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getSimSz(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+           mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmsimsz", function(startTime) {...});
 
 /**
  * Register event handlers of the menu item - "GLM - Common Fate"
  */
 self.port.on("handler-LI-glmcomf", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getCommonFate(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getCommonFate(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+                mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmcomf", function(startTime) {...});
 
 /**
  * Register event handlers of the menu item - "GLM - Continuity"
  */
 self.port.on("handler-LI-glmcon", function(startTime) {
-  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
-  getContinuity(layerTree.root, layerTree.getTreeSize(), layerTree.root, 1, []);
+  var mergingResults = [];
+  getContinuity(new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).root,
+                mergingResults);
+  updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmcon", function(startTime) {...});
 

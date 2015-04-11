@@ -1,287 +1,155 @@
 /**
  * Apply Gestalt Law of All and save result
  */
-function getAllLaws(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling) {
-    var i = 0;
-    var same = (node.height === sibling.height && node.width === sibling.width) ||          // Similarity (Size)
-               (node.left === sibling.left || node.top === sibling.top ||                   // Continuity
-                node.right === sibling.right || node.bottom === sibling.bottom) ||
-               (node.css["position"] === sibling.css["position"]);                          // Common Fate
-    if (same) {
-      for (; i < 29; i++)
-        if (node.css[properties[23 + i]] !== sibling.css[properties[23 + i]])
+function getAllLaws(node, mergingResults) {
+  var hDistances = [], sames = [];
+  for (var i = 0; i < node.childCount; i++) {
+    getAllLaws(node.children[i], mergingResults);
+    if (i === node.childCount - 1)
+      continue ;
+    var child1 = node.children[i], child2 = node.children[i + 1];
+    var same = (child1.height === child2.height && child1.width === child2.width);            // Similarity - Sz
+    if (!same)
+      same = (child1.left === child2.left || child1.top === child2.top ||                     // Continuity
+              child1.right === child2.right || child1.bottom === child2.bottom);
+    if (!same)
+      same = (child1.css["position"] == child2.css["position"]);                              // Common Fate
+    if (!same) {
+      var bgColor1 = child1.css["background-color"], bgImage1 = child1.css["background-image"];
+      var bgColor2 = child2.css["background-color"], bgImage2 = child2.css["background-image"];
+      same = (bgImage1 != "none" && bgImage2 != "none" && sameImage(bgImage1, bgImage2));    // Similarity - Bg
+      if (!same)
+        same = (bgImage1 == "none" && bgImage2 == "none" && sameColorByCIE2000(bgColor1, bgColor2));
+    } // if (!same)
+    if (!same) {
+      var index = 0;
+      for (; index < 29; index++)
+        if (child1.css[properties[23 + index]] != child2.css[properties[23 + index]])
           break ;
-      same = (i >= 29 && sameColorByCIE2000(node.css["color"], sibling.css["color"])) ||    // Similarity (Text)
-             (normalizedHausdorffDistance(node, sibling) < 1.5);                            // Proximity
-      if (same) {
-        var bgColor1 = node.css["background-color"], bgImage1 = node.css["background-image"];
-        var bgColor2 = sibling.css["background-color"], bgImage2 = sibling.css["background-image"];
-        if (bgImage1 === "none" && bgImage2 === "none" && sameColorByCIE2000(bgColor1, bgColor2))
-          mergeLayerNodes(node, sibling, mergingResults);
-        else if (bgImage1 !== "none" && bgImage2 !== "none")                                // Similarity (Bg)
-          sameImage(bgImage1, bgImage2, function(sameImg) {
-            if (sameImg)
-              mergeLayerNodes(node, sibling, mergingResults);
-            // After current procedure
-            if (node.childCount > 0)                              // first go to its children
-              getAllLaws(root, size, node.firstChild, number + 1, mergingResults);
-            else if (node.nextSibling)                            // then go to its next sibling
-              getAllLaws(root, size, node.nextSibling, number + 1, mergingResults);
-            else {                                                // then go to its uncle (parent's next sibling)
-              var parent = node.parent;
-              if (parent) {
-                var uncle = parent.nextSibling;
-                while (!uncle) {
-                  if (parent === root)                            // if all ancestors have no next sibling,
-                    return ;                                      // then it means traversing has finished
-                  parent = parent.parent;
-                  uncle = parent.nextSibling;
-                } // while (!uncle)
-                getAllLaws(root, size, uncle, number + 1, mergingResults);
-              } // if (parent)
-            } // if - else if - else
-            return ;
-          }); // sameImage(bgImage1, bgImage2, function(same) {...});
-      } // if (same)
-    } // if (same)
-  } // if (sibling)
-  if (number === size)
-    updatePage(mergingResults);
+      same = (index >= 29 && sameColorByCIE2000(child1.css["color"], child2.css["color"]));   // Similarity - Txt
+    } // if (!same)
+    sames.push(same);
+    hDistances.push(normalizedHausdorffDistance(child1, child2));
+  } // for (var i = 0; i < node.childCount; i++)
 
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getAllLaws(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getAllLaws(root, size, node.nextSibling, number + 1, mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getAllLaws(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getAllLaws(root, size, node, number, mergingResults)
+  // Check all laws
+  if (hDistances.length !== 0) {
+    var avg = 0.0;
+    for (var i = 0; i < hDistances.length; i++)
+      avg += hDistances[i];
+    avg /= hDistances.length;
+    for (var i = 0; i < hDistances.length; i++)
+      if (sames[i] || hDistances[i] <= avg)
+        mergeLayerNodes(node.children[i], node.children[i+1], mergingResults);
+  } // if (hDistances.length !== 0)
+} // function getAllLaws(node, mergingResults)
 
 /**
  * Apply Gestalt Law of Proximity and save result
  */
-function getProximity(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling && normalizedHausdorffDistance(node, sibling) < 1.5)
-      mergeLayerNodes(node, sibling, mergingResults);
-  if (number === size)
-    updatePage(mergingResults);
-
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getProximity(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getProximity(root, size, node.nextSibling, number + 1,  mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getProximity(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getProximity(root, size, node, number, mergingResults)
+function getProximity(node, mergingResults) {
+  var hDistances = [];
+  var avg = 0.0;
+  for (var i = 0; i < node.childCount; i++) {
+    getProximity(node.children[i], mergingResults);
+    if (i === node.childCount - 1)
+      continue ;
+    var hDistance = normalizedHausdorffDistance(node.children[i], node.children[i+1]);
+    avg += hDistance;
+    hDistances.push(hDistance);
+  } // for (var i = 0; i < node.childCount; i++)
+  if (hDistances.length > 0) {
+    avg /= hDistances.length;
+    for (var i = 0; i < hDistances.length; i++)
+      if (hDistances[i] <= avg)
+        mergeLayerNodes(node.children[i], node.children[i+1], mergingResults);
+  } // if (hDistances.length > 0)
+} // function getProximity(node, mergingResults)
 
 /**
  * Apply Gestalt Law of Similarity (Bg) and save result
  */
-function getSimBg(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling) {
-    var bgColor1 = node.css["background-color"], bgImage1 = node.css["background-image"];
-    var bgColor2 = sibling.css["background-color"], bgImage2 = sibling.css["background-image"];
-    if (bgImage1 === "none" && bgImage2 === "none" && sameColorByCIE2000(bgColor1, bgColor2))
-      mergeLayerNodes(node, sibling, mergingResults);
-    else if (bgImage1 !== "none" && bgImage2 !== "none")
-      sameImage(bgImage1, bgImage2, function(same) {
-        if (same)
-          mergeLayerNodes(node, sibling, mergingResults);
-        // After current procedure
-        if (node.childCount > 0)                              // first go to its children
-          getSimBg(root, size, node.firstChild, number + 1, mergingResults);
-        else if (node.nextSibling)                            // then go to its next sibling
-          getSimBg(root, size, node.nextSibling, number + 1, mergingResults);
-        else {                                                // then go to its uncle (parent's next sibling)
-          var parent = node.parent;
-          if (parent) {
-            var uncle = parent.nextSibling;
-            while (!uncle) {
-              if (parent === root)                            // if all ancestors have no next sibling,
-                return ;                                      // then it means traversing has finished
-              parent = parent.parent;
-              uncle = parent.nextSibling;
-            } // while (!uncle)
-            getSimBg(root, size, uncle, number + 1, mergingResults);
-          } // if (parent)
-        } // if - else if - else
-        return ;
-      }); // sameImage(bgImage1, bgImage2, function(same) {...});
-  } // if (sibling)
-  if (number === size)
-    updatePage(mergingResults);
-
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getSimBg(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getSimBg(root, size, node.nextSibling, number + 1, mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getSimBg(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getSimBg(root, size, node, number, mergingResults)
+function getSimBg(node, mergingResults) {
+  for (var i = 0; i < node.childCount; i++) {
+    if (i !== 0) {
+      var previous = node.children[i - 1];
+      var current = node.children[i];
+      var bgColor1 = previous.css["background-color"], bgColor2 = current.css["background-color"];
+      var bgImage1 = previous.css["background-image"], bgImage2 = current.css["background-image"];
+      if (bgImage1 != "none" && bgImage2 != "none")
+        sameImage(bgImage1, bgImage2, function(same) {
+          if (same)
+            mergeLayerNodes(previous, current, mergingResults);
+        }); // sameImage(bgImage1, bgImage2, function(same) {...});
+      else if (bgImage1 == "none" && bgImage2 == "none" && sameColorByCIE2000(bgColor1, bgColor2))
+        mergeLayerNodes(previous, current, mergingResults);
+    } // if (i !== 0)
+    getSimBg(node.children[i], mergingResults);
+  } // for (var i = 0; i < node.childCount; i++)
+} // function getSimBg(node, mergingResults)
 
 /**
  * Apply Gestalt Law of Similarity (text) and save result
  */
-function getSimTxt(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling) {
-    var i = 0;
-    for (; i < 29; i++)
-      if (node.css[properties[23 + i]] !== sibling.css[properties[23 + i]])
-        break ;
-    if (i >= 29 && sameColorByCIE2000(node.css["color"], sibling.css["color"]))
-      mergeLayerNodes(node, sibling, mergingResults);
-  } // if (sibling)
-  if (number === size)
-    updatePage(mergingResults);
-
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getSimTxt(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getSimTxt(root, size, node.nextSibling, number + 1, mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getSimTxt(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getSimTxt(root, size, node, number, mergingResults)
+function getSimTxt(node, mergingResults) {
+  for (var i = 0; i < node.childCount; i++) {
+    if (i !== 0) {
+      var previous = node.children[i - 1];
+      var current = node.children[i];
+      var j = 0;
+      for (; j < 29; j++)
+        if (previous.css[properties[23 + j]] !== current.css[properties[23 + j]])
+          break ;
+      if (j >= 29 && sameColorByCIE2000(previous.css["color"], current.css["color"]))
+        mergeLayerNodes(previous, current, mergingResults);
+    } // if (i !== 0)
+    getSimTxt(node.children[i], mergingResults);
+  } // for (var i = 0; i < node.childCount; i++)
+} // function getSimTxt(node, mergingResults)
 
 /**
  * Apply Gestalt Law of Similarity (size) and save result
  */
-function getSimSz(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling && (node.height === sibling.height && node.width === sibling.width))
-    mergeLayerNodes(node, sibling, mergingResults);
-  if (number === size)
-    updatePage(mergingResults);
-
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getSimSz(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getSimSz(root, size, node.nextSibling, number + 1, mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getSimSz(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getSimSz(root, size, node, number, mergingResults)
+function getSimSz(node, mergingResults) {
+  for (var i = 0; i < node.childCount; i++) {
+    if (i !== 0) {
+      var previous = node.children[i - 1];
+      var current = node.children[i];
+      if (previous.height === current.height && previous.width === current.width)
+        mergeLayerNodes(previous, current, mergingResults);
+    } // if (i !== 0)
+    getSimSz(node.children[i], mergingResults);
+  } // for (var i = 0; i < node.childCount; i++)
+} // function getSimSz(node, mergingResults)
 
 /**
  * Apply Gestalt Law of Common Fate and save result
  */
-function getCommonFate(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling && node.css["position"] === sibling.css["position"])
-    mergeLayerNodes(node, sibling, mergingResults);
-  if (number === size)
-    updatePage(mergingResults);
-
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getCommonFate(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getCommonFate(root, size, node.nextSibling, number + 1, mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getCommonFate(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getCommonFate(root, size, node, number, mergingResults)
+function getCommonFate(node, mergingResults) {
+  for (var i = 0; i < node.childCount; i++) {
+    if (i !== 0) {
+      var previous = node.children[i - 1];
+      var current = node.children[i];
+      if (previous.css["position"] == current.css["position"])
+        mergeLayerNodes(previous, current, mergingResults);
+    } // if (i !== 0)
+    getCommonFate(node.children[i], mergingResults);
+  } // for (var i = 0; i < node.childCount; i++)
+} // function getCommonFate(node, mergingResults)
 
 /**
  * Apply Gestalt Law of Continuity and save result
  */
-function getContinuity(root, size, node, number, mergingResults) {
-  var sibling = node.nextSibling;
-  if (sibling && (node.left === sibling.left || node.top === sibling.top ||
-                  node.right === sibling.right || node.bottom === sibling.bottom))
-    mergeLayerNodes(node, sibling, mergingResults);
-  if (number === size)
-    updatePage(mergingResults);
-
-  // After current procedure
-  if (node.childCount > 0)                                    // first go to its children
-    getContinuity(root, size, node.firstChild, number + 1, mergingResults);
-  else if (node.nextSibling)                                  // then go to its next sibling
-    getContinuity(root, size, node.nextSibling, number + 1, mergingResults);
-  else {                                                      // then go to its uncle (parent's next sibling)
-    var parent = node.parent;
-    if (parent) {
-      var uncle = parent.nextSibling;
-      while (!uncle) {
-        if (parent === root)                                  // if all ancestors have no next sibling,
-          return ;                                            // then it means traversing has finished
-        parent = parent.parent;
-        uncle = parent.nextSibling;
-      } // while (!uncle)
-      getContinuity(root, size, uncle, number + 1, mergingResults);
-    } // if (parent)
-  } // if - else if - else
-} // function getContinuity(root, size, node, number, mergingResults)
+function getContinuity(node, mergingResults) {
+  for (var i = 0; i < node.childCount; i++) {
+    if (i !== 0) {
+      var previous = node.children[i - 1];
+      var current = node.children[i];
+      if (previous.left === current.left || previous.top === current.top ||
+          previous.right === current.right || previous.bottom === current.bottom)
+        mergeLayerNodes(previous, current, mergingResults);
+    } // if (i !== 0)
+    getContinuity(node.children[i], mergingResults);
+  } // for (var i = 0; i < node.childCount; i++)
+} // function getContinuity(node, mergingResults)
 
