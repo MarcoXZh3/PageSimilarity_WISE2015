@@ -44,7 +44,7 @@ const GestaltPS_Handler = (panel, event) => {
                         data.url("libs/libs.js"),
                         data.url("libs/lzma.js"),
                         data.url("libs/lzma_worker.js"),
-                        data.url("libs/html2canvas.js"),
+                        data.url("libs/html2canvas.min.js"),
                         data.url("gestaltLM/LayerTree.js"),
                         data.url("gestaltLM/GLM_Helper.js"),
                         data.url("gestaltLM/GestaltLaws.js"),
