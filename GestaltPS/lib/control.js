@@ -1,6 +1,10 @@
-const {Cc, Ci} = require("chrome");
+const {Cc, Ci, Cu} = require("chrome");
 const data = require("sdk/self").data;
+const tabs = require("sdk/tabs");
 const { Hotkey } = require("sdk/hotkeys");
+Cu.import("resource://gre/modules/Downloads.jsm");
+Cu.import("resource://gre/modules/osfile.jsm")
+Cu.import("resource://gre/modules/Task.jsm");
 
 const register = (panel) => {
   panel.port.on("click-LI-similarity", function() { GestaltPS_Handler(panel, "handler-LI-similarity"); });
@@ -23,6 +27,8 @@ const register = (panel) => {
   Hotkey({combo: "control-alt-f", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcomf"); }});
   panel.port.on("click-LI-glmcon", function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); });
   Hotkey({combo: "control-alt-c", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); }});
+  panel.port.on("click-LI-screenshot", function() { GestaltPS_Handler(panel, "handler-LI-screenshot"); });
+  Hotkey({combo: "control-alt-r", onPress: function() { GestaltPS_Handler(panel, "handler-LI-screenshot"); }});
 }; // const register = (panel) => { ... };
 
 /*const prefs = Cc["@mozilla.org/preferences-service;1"].
@@ -38,6 +44,7 @@ const GestaltPS_Handler = (panel, event) => {
                         data.url("libs/libs.js"),
                         data.url("libs/lzma.js"),
                         data.url("libs/lzma_worker.js"),
+                        data.url("libs/html2canvas.js"),
                         data.url("gestaltLM/LayerTree.js"),
                         data.url("gestaltLM/GLM_Helper.js"),
                         data.url("gestaltLM/GestaltLaws.js"),
@@ -72,6 +79,12 @@ const GestaltPS_Handler = (panel, event) => {
          { features: {width: 800, height: 450, centerscreen: true} }
     ); // open(uri, options)
   }); // worker.port.on("resp-LI-blocktree", function(time, msg) { ... });
+
+  // Receive the respond message of the "Batch Screenshot"
+  worker.port.on("resp-LI-screenshot", function(time, msg) {
+    const { open } = require("sdk/window/utils");
+    open(msg, { features: {width: 800, height: 450, centerscreen: true} });
+  }); // worker.port.on("resp-LI-screenshot", function(time, msg) { ... });
 
 }; // const GestaltPS_Handler = (panel, event) => { ... };
 

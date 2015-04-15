@@ -12,6 +12,7 @@ self.port.on("load", function onShow(imgs) {
   document.getElementById("gps-img-glmsimsz").src = imgs[7];
   document.getElementById("gps-img-glmcomf").src = imgs[8];
   document.getElementById("gps-img-glmcon").src = imgs[9];
+  document.getElementById("gps-img-screenshot").src = imgs[10];
 
   document.getElementById("gps-li-similarity").onclick = function() { self.port.emit("click-LI-similarity"); };
   document.getElementById("gps-li-layertree").onclick = function() { self.port.emit("click-LI-layertree"); };
@@ -23,6 +24,7 @@ self.port.on("load", function onShow(imgs) {
   document.getElementById("gps-li-glmsimsz").onclick = function() { self.port.emit("click-LI-glmsimsz"); };
   document.getElementById("gps-li-glmcomf").onclick = function() { self.port.emit("click-LI-glmcomf"); };
   document.getElementById("gps-li-glmcon").onclick = function() { self.port.emit("click-LI-glmcon"); };
+  document.getElementById("gps-li-screenshot").onclick = function() { self.port.emit("click-LI-screenshot"); };
 }); // self.port.on("load", function onShow(imgs) {...});
 
 /**
@@ -120,4 +122,14 @@ self.port.on("handler-LI-glmcon", function(startTime) {
                 mergingResults);
   updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmcon", function(startTime) {...});
+
+/**
+ * Register event handlers of the menu item - "Batch Screenshot"
+ * http://html2canvas.hertzen.com/
+ */
+self.port.on("handler-LI-screenshot", function(startTime) {
+  html2canvas(document.body, {onrendered: function(canvas) {
+    self.port.emit("resp-LI-screenshot", new Date().getTime() - startTime, canvas.toDataURL("image/png"));
+  }}); // html2canvas(document.body, {onrendered: function(canvas) { ... }});
+}); // self.port.on("handler-LI-screenshot", function(startTime) {...});
 
