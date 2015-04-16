@@ -42,16 +42,11 @@ const GestaltPS_Handler = (panel, event) => {
   panel.hide();
   if (event == "handler-LI-screenshot") {
     //TODO: read database to assign values to "links", and set proper size to splice the "links" into "urls"
-    var links = ["http://www.alexa.com/topsites/global;1",
-                "http://www.alexa.com/topsites/global;2",
-                "http://www.alexa.com/topsites/global;3",
-                "http://www.alexa.com/topsites/global;4",
-                "http://www.alexa.com/topsites/global;5",
-                "http://www.alexa.com/topsites/global;6",
-                "http://www.alexa.com/topsites/global;7"];
+    var links = ["http://www.ualberta.ca/",
+                 "https://www.mozilla.org/en-US/about/"];
     var urls = links.splice(0, 16);
     for (i in urls) {
-      tabs.open({ url: urls[i], onReady: function(tab) {
+      tabs.open({ url: urls[i], onLoad: function(tab) {
         const worker = tab.attach({contentScriptFile: [data.url("libs/html2canvas.min.js"),
                                                        data.url("mpControl.js")] });
         worker.port.emit("handler-LI-screenshot", new Date().getTime());
@@ -64,7 +59,7 @@ const GestaltPS_Handler = (panel, event) => {
                                   filename + ".png"));
           }).then(null, Cu.reportError);
         }); // worker.port.on("resp-LI-screenshot", function(time, msg) { ... });
-      } }); // tabs.open({ url: urls[i], onReady: function(tab) { ... }})
+      } }); // tabs.open({ url: urls[i], onLoad: function(tab) { ... }})
     } // for (i in urls)
     tabs.on("close", function(){
       if (links.length <= 0)
