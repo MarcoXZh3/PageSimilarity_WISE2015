@@ -75,7 +75,6 @@ const prefGestaltPS =
   "http://www.cbssports.com/~~" +
   "http://Ce.cn~~" +
   "https://www.chase.com/~~" +
-  "https://chaturbate.com/~~" +
   "http://China.com~~" +
   "http://www.china.com.cn/~~" +
   "http://www.chinadaily.com.cn/~~" +
@@ -1033,7 +1032,6 @@ const prefGestaltPS =
   "http://www.toofab.com/2015/03/27/spectre-teaser-trailer-video-daniel-craig/~~" +
   "http://li.mama.cn/~~" +
   "http://list.iqiyi.com/www/29/24085-------------11-1-2-iqiyi-1-.html~~" +
-  "https://chaturbate.com/other-region-cams/~~" +
   "http://indianapolis.about.com~~" +
   "http://www.nba.com/standings/2012/team_record_comparison/conferenceNew_Std_Div.html?ls=iref:nba:gnav~~" +
   "http://www.hurriyet.com.tr/yerel-haberler/~~" +
@@ -1427,7 +1425,6 @@ const prefGestaltPS =
   "http://www.gome.com.cn/category/cat21655574.html~~" +
   "http://support.microsoft.com/contactus/?ln=en-ca&ws=canadaen~~" +
   "http://bj.esf.focus.cn/sale/chaoyang/~~" +
-  "https://chaturbate.com/franf_/~~" +
   "http://health.kompas.com~~" +
   "http://car.bitauto.com/aidier-2595/~~" +
   "http://www.newegg.com/Academic-Software/SubCategory/ID-369?name=Academic~~" +
@@ -1529,7 +1526,6 @@ const prefGestaltPS =
   "http://baobao.ci123.com/posts/show/2332850~~" +
   "http://yuedu.163.com/source/919c5a452e074ea29e6125b00e662f99_4~~" +
   "http://www.cbscares.com/~~" +
-  "https://chaturbate.com/6-tokens-per-minute-private-cams/female/~~" +
   "http://www.baidu.com/~~" +
   "https://www.kickstarter.com/discover/categories/photography?ref=home_featured~~" +
   "http://www.imdb.com/news/top?ref_=nv_nw_tp_1~~" +
@@ -1564,7 +1560,6 @@ const prefGestaltPS =
   "http://www.youtube.com/Skype~~" +
   "http://www.fishwrapper.com/post/2015/03/27/hanson-isaac-taylor-zac-brothers-90s-music-pictures-photos-pics-then-now/~~" +
   "http://binzhou.xcar.com.cn/~~" +
-  "https://chaturbate.com/baby_love73/~~" +
   "http://www.dell.com/support/home/?c=us&l=en&s=bsd~~" +
   "http://www.enet.com.cn/oa/alist7783.html~~" +
   "http://car.bitauto.com/xuebaox80/~~" +
@@ -1777,7 +1772,6 @@ const prefGestaltPS =
   "http://www.newegg.com/Safes/SubCategory/ID-3337~~" +
   "http://www.nba.com/history/?ls=iref:nba:gnav~~" +
   "http://www.groupon.com//www.groupon.com/deals/gg-ca-3-piece-expandable-hard-sided-spinner-luggage-set~~" +
-  "https://chaturbate.com/exhibitionist-cams/~~" +
   "http://toronto.craigslist.ca//owensound.craigslist.ca~~" +
   "http://my.pclady.com.cn/a/z-55485.html~~" +
   "http://www.bilibili.com/video/music-Cover-1.html~~" +
@@ -2540,7 +2534,6 @@ const prefGestaltPS =
   "http://mobile.zol.com.cn/512/5129567.html~~" +
   "http://Slickdeals.net/f/7755589-lenovo-y40-laptop-i7-5500u-8gb-ddr3-1tb-hdd-8gb-sshd-14-1920x1080-led-2gb-radeon-r9-m275-629-with-free-shipping~~" +
   "http://club2011.auto.163.com/post/100013609817.html~~" +
-  "https://chaturbate.com/sinicalapril/~~" +
   "http://www.reddit.com/r/announcements/~~" +
   "http://bbs.gmw.cn/thread-3259002-1-1.html~~" +
   "http://www.nytimes.com/2015/03/31/health/learning-to-say-no-to-dialysis.html~~" +
@@ -2634,7 +2627,6 @@ const prefGestaltPS =
   "http://www.babytree.com/learn/specialtopic/sanjing~~" +
   "https://www.facebook.com/envatomarket~~" +
   "http://event.rakuten.co.jp/mc/pg/pantene/~~" +
-  "http://it.chaturbate.com/~~" +
   "http://xfinitytv.comcast.net/microsite/latino?cmpid=FCST_hero_XL_LaBiblia~~" +
   "http://Codecanyon.net/category/wordpress/social-networking~~" +
   "https://www.youtube.com/user/webtrethocom~~" +
@@ -2741,7 +2733,6 @@ const prefGestaltPS =
   "http://vegan.about.com~~" +
   "http://www.apple.com/watch/~~" +
   "http://car.bitauto.com/minyiyipaiban/~~" +
-  "https://chaturbate.com/tag/chubby/~~" +
   "http://club.xywy.com/tagcloud/pifuke~~" +
   "http://www.cbssports.com/fantasy~~" +
   "http://cancer.39.net/a/150327/4597848.html~~" +
@@ -3588,7 +3579,6 @@ const prefGestaltPS =
   "http://jbk.39.net/bw/yan_t2~~" +
   "http://mediaset.vitv.it/panoramautotv/451672?ref=motorlife~~" +
   "http://toronto.craigslist.ca/mss/~~" +
-  "https://chaturbate.com/vanessabrown/~~" +
   "http://Themeforest.net/category/ecommerce/oscommerce~~" +
   "http://product.pconline.com.cn/tabletpc/c8931/~~" +
   "http://www.dailymail.co.uk/tvshowbiz/article-3013433/Kim-Kardashian-immortalizes-platinum-blonde-hair-Elle-France-cover.html~~" +
@@ -4030,7 +4020,6 @@ const prefGestaltPS =
   "http://ads.globo.com/RealMedia/ads/click_nx.ads/globo.com/globo.com/home/@x61~~" +
   "http://www.abs-cbnnews.com/business~~" +
   "http://www.t-online.de/spiele/id_19763884/wimmelbildspiele-kostenlos-online-wimmelbild-spiele-gratis-spielen.html~~" +
-  "https://chaturbate.com/transsexual-cams/~~" +
   "https://ca.celebrity.yahoo.com/parenting/~~" +
   "http://stamps.about.com~~" +
   "http://www.policybazaar.com/~~" +
@@ -4093,6 +4082,17 @@ const prefGestaltPS =
   "https://ca.godaddy.com/icann/domain_search.aspx~~" +
   "http://edu.163.com/15/0328/09/ALPLRN9700294IIH.html~~" +
   "http://www.xcar.com.cn/bbs/viewthread.php?tid=21680519~~" +
-  "http://www.fedex.com/au/";
+  "http://www.fedex.com/au/~~" +
+  "http://Themeforest.net/item/union-wedding-template-with-page-builder/10450812~~" +
+  "http://elpais.com/ccaa/andalucia.html~~" +
+  "http://baike.pcbaby.com.cn/qzbd/953627.html~~" +
+  "http://baike.pcbaby.com.cn/qzbd/953632.html~~" +
+  "http://s.b5m.com/s/Search?key=%E7%BA%BA%E7%BB%87%E5%93%81&isKnn=0~~" +
+  "http://jigou.eastmoney.com/stock.html~~" +
+  "http://www.alibaba.com/Inverters-Converters_pid14191102~~" +
+  "http://detail.zol.com.cn/digital_camcorder/p25456/~~" +
+  "http://ameblo.jp/ameba-ad-pr/entry-10998111355.html~~" +
+  "http://bk-2.jp/~~" +
+  "http://win8app.pchome.net/";
 
 exports.prefGestaltPS = prefGestaltPS;

@@ -123,3 +123,13 @@ self.port.on("handler-LI-glmcon", function(startTime) {
   updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmcon", function(startTime) {...});
 
+/**
+ * Register event handlers of the menu item - "Batch Screenshot"
+ */
+self.port.on("handler-LI-screenshot", function(startTime) {
+  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
+  var blockTree = new BlockTree(new BlockTreeNode([layerTree.root], "/0"), document.URL);
+  blockTree.buildUpTree(layerTree);
+  //blockTree.treeInPage();
+  self.port.emit("resp-LI-screenshot", new Date().getTime() - startTime, blockTree.toString());
+}); // self.port.on("handler-LI-screenshot", function(startTime) {...});

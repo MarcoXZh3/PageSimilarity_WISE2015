@@ -1,4 +1,5 @@
 const {Cc, Ci, Cu} = require("chrome");
+const tabs = require("sdk/tabs");
 const data = require("sdk/self").data;
 const { Hotkey } = require("sdk/hotkeys");
 
@@ -6,11 +7,16 @@ const prefs = Cc["@mozilla.org/preferences-service;1"].
                 getService(Ci.nsIPrefService).
                 getBranch("extensions.GestaltPS.");
 prefs.setCharPref("TopSites", require("./preferences.js").prefGestaltPS);
-var links = prefs.getCharPref("TopSites").split("~~");
-var counter = 1, total = links.length;
+var webpages = prefs.getCharPref("TopSites").split("~~");
+/*webpages = ["http://www.example.com/topsites/global;1",
+            "http://www.1.com/",
+            "http://www.alexa.com/topsites/global;3",
+            "http://www.alexa.com/topsites/global;4",
+            "http://www.alexa.com/topsites/global;5",
+            "http://www.alexa.com/topsites/global;6",
+            "http://www.2.com/"];*/
+var counter = 1, total = webpages.length;
 
-//TODO: read database to assign values to "links", and set proper size to splice the "links" into "urls"
-//var links = ["http://Stackexchange.com//stackexchange.com"];
 
 const register = (panel) => {
   panel.port.on("click-LI-similarity", function() { GestaltPS_Handler(panel, "handler-LI-similarity"); });
@@ -33,13 +39,13 @@ const register = (panel) => {
   Hotkey({combo: "control-alt-f", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcomf"); }});
   panel.port.on("click-LI-glmcon", function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); });
   Hotkey({combo: "control-alt-c", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); }});
-  panel.port.on("click-LI-screenshot", function() { panel.hide(); Batch_Screenshot(links); });
-  Hotkey({combo: "control-alt-r", onPress: function() { panel.hide(); Batch_Screenshot(links); }});
+  panel.port.on("click-LI-screenshot", function() { panel.hide(); Batch_Screenshot(webpages, 3); });
+  Hotkey({combo: "control-alt-r", onPress: function() { panel.hide(); Batch_Screenshot(webpages, 3); }});
 }; // const register = (panel) => { ... };
 
 const GestaltPS_Handler = (panel, event) => {
   panel.hide();
-  const worker = require("sdk/tabs").activeTab.attach({
+  const worker = tabs.activeTab.attach({
     contentScriptFile: [data.url("libs/JsTree.js"),
                         data.url("libs/libs.js"),
                         data.url("libs/lzma.js"),
@@ -50,7 +56,7 @@ const GestaltPS_Handler = (panel, event) => {
                         data.url("BlockTree.js"),
                         data.url("mpControl.js")
     ] // contentScriptFile: [ ... ]
-  }); // const worker = require("sdk/tabs").activeTab.attach({...});
+  }); // const worker = tabs.activeTab.attach({...});
 
   // Send the corresponding event to the active tab
   worker.port.emit(event, new Date().getTime());
@@ -81,43 +87,60 @@ const GestaltPS_Handler = (panel, event) => {
 
 }; // const GestaltPS_Handler = (panel, event) => { ... };
 
-const Batch_Screenshot = (links) => {
-  const tabs = require("sdk/tabs");
-  var urls = links.splice(0, 3);
+const Batch_Screenshot = (links, number) => {
+  var urls = links.splice(0, number);
   for (i in urls)
-    tabs.open({ url: urls[i], onLoad: function(tab) { Screenshot(tab);} });
+    tabs.open({ url: urls[i], onLoad: function(tab) { try{ Screenshot(tab); } catch(err) { tab.close(); } } });
   tabs.on("close", function(){
     if (links.length <= 0)
       return ;
     url = links.splice(0, 1);
-    tabs.open({ url: url[0], onLoad: function(tab) { Screenshot(tab);} });
+    tabs.open({ url: url[0], onLoad: function(tab) { try{ Screenshot(tab); } catch(err) { tab.close(); } } });
   }); // tabs.on("close", function(){ ... });
-}; // const Batch_Screenshot = (links) => { ... };
+}; // const Batch_Screenshot = (links, number) => { ... };
 
 const Screenshot = (tab) => {
-  console.log((counter++) + "/" + total + ": " + tab.url);
-  var window = require('sdk/window/utils').getMostRecentBrowserWindow();
-  var canvas = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
-  window = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIWebNavigation)
-             .QueryInterface(Ci.nsIDocShellTreeItem).rootTreeItem
-             .QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindow)
-             .gBrowser.browsers[tab.index].contentWindow;
-  canvas.width = window.document.body.scrollWidth;
-  canvas.height = window.document.body.scrollHeight;
-  var ctx = canvas.getContext("2d");
-  ctx.drawWindow(window, 0, 0, canvas.width, canvas.height, "#FFF");
-  var filename = tab.url.replace(/\//g, "%E2").replace(/:/g, "%3A");
-  tab.close();
+  const worker = tab.attach({contentScriptFile: [data.url("libs/JsTree.js"),
+                                                  data.url("libs/libs.js"),
+                                                  data.url("libs/lzma.js"),
+                                                  data.url("libs/lzma_worker.js"),
+                                                  data.url("gestaltLM/LayerTree.js"),
+                                                  data.url("gestaltLM/GLM_Helper.js"),
+                                                  data.url("gestaltLM/GestaltLaws.js"),
+                                                  data.url("BlockTree.js"),
+                                                  data.url("mpControl.js")]}); 
+  worker.port.emit("handler-LI-screenshot", new Date().getTime());
+  worker.port.on("resp-LI-screenshot", function(time, msg) {
+    console.log((counter++) + "/" + total + ": " + tab.url);
 
-  Cu.import("resource://gre/modules/Downloads.jsm");
-  Cu.import("resource://gre/modules/osfile.jsm")
-  Cu.import("resource://gre/modules/Task.jsm");
-  Task.spawn(function () {
-    yield Downloads.fetch(canvas.toDataURL().replace("image/png", "image/octet-stream"),
-                          OS.Path.join(OS.Constants.Path.desktopDir,
-                          filename + ".png"));
-  }).then(null, Cu.reportError);
+    // Get the webpage screenshot as PNG image
+    var window = require('sdk/window/utils').getMostRecentBrowserWindow();
+    var canvas = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+    window = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIWebNavigation)
+               .QueryInterface(Ci.nsIDocShellTreeItem).rootTreeItem
+               .QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindow)
+               .gBrowser.browsers[tab.index].contentWindow;
+    canvas.width = window.document.body.scrollWidth;
+    canvas.height = window.document.body.scrollHeight;
+    var ctx = canvas.getContext("2d");
+    ctx.drawWindow(window, 0, 0, canvas.width, canvas.height, "#FFF");
+    var filename = tab.url.replace(/\//g, "%E2").replace(/:/g, "%3A");
+    Cu.import("resource://gre/modules/Downloads.jsm");
+    Cu.import("resource://gre/modules/osfile.jsm")
+    Cu.import("resource://gre/modules/Task.jsm");
+    Task.spawn(function () {
+      yield Downloads.fetch(canvas.toDataURL().replace("image/png", "image/octet-stream"),
+                            OS.Path.join(OS.Constants.Path.desktopDir, filename + ".png"));
+    }).then(null, Cu.reportError);
+
+    // Get the block tree dump as TXT
+    const {TextDecoder, TextEncoder} = Cu.import("resource://gre/modules/osfile.jsm", {});
+    var encoder = new TextEncoder();
+    var array = encoder.encode(msg.substr(msg.indexOf("\n") + 1, msg.length));
+    var promise = OS.File.writeAtomic(OS.Path.join(OS.Constants.Path.desktopDir, filename + ".txt"), array,
+                                      {tmpPath: OS.Path.join(OS.Constants.Path.desktopDir, filename + ".tmp")});
+    tab.close();
+  }); // worker.port.on("resp-LI-screenshot", function(time, msg) { ... });
 }; // const Screenshot = (tab) => { ... };
 
 exports.register = register;
-
