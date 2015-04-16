@@ -123,13 +123,3 @@ self.port.on("handler-LI-glmcon", function(startTime) {
   updatePage(mergingResults);
 }); // self.port.on("handler-LI-glmcon", function(startTime) {...});
 
-/**
- * Register event handlers of the menu item - "Batch Screenshot"
- * http://html2canvas.hertzen.com/
- */
-self.port.on("handler-LI-screenshot", function(startTime) {
-  html2canvas(document.body, {onrendered: function(canvas) {
-    self.port.emit("resp-LI-screenshot", new Date().getTime() - startTime, canvas.toDataURL("image/png"));
-  }}); // html2canvas(document.body, {onrendered: function(canvas) { ... }});
-}); // self.port.on("handler-LI-screenshot", function(startTime) {...});
-
