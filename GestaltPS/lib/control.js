@@ -2,20 +2,15 @@ const {Cc, Ci, Cu} = require("chrome");
 const data = require("sdk/self").data;
 const { Hotkey } = require("sdk/hotkeys");
 
-/*const prefs = Cc["@mozilla.org/preferences-service;1"].
+const prefs = Cc["@mozilla.org/preferences-service;1"].
                 getService(Ci.nsIPrefService).
                 getBranch("extensions.GestaltPS.");
 prefs.setCharPref("TopSites", require("./preferences.js").prefGestaltPS);
-const topSites = prefs.getCharPref("TopSites").split("/");*/
+var links = prefs.getCharPref("TopSites").split(" ");
+var counter = 1, total = links.length;
 
 //TODO: read database to assign values to "links", and set proper size to splice the "links" into "urls"
-var links = ["http://www.alexa.com/topsites/global;1",
-            "http://www.alexa.com/topsites/global;2",
-            "http://www.alexa.com/topsites/global;3",
-            "http://www.alexa.com/topsites/global;4",
-            "http://www.alexa.com/topsites/global;5",
-            "http://www.alexa.com/topsites/global;6",
-            "http://www.alexa.com/topsites/global;7"];
+//var links = ["http://Stackexchange.com//stackexchange.com"];
 
 const register = (panel) => {
   panel.port.on("click-LI-similarity", function() { GestaltPS_Handler(panel, "handler-LI-similarity"); });
@@ -100,6 +95,7 @@ const Batch_Screenshot = (links) => {
 }; // const Batch_Screenshot = (links) => { ... };
 
 const Screenshot = (tab) => {
+  console.log((counter++) + "/" + total + ": " + tab.url);
   var window = require('sdk/window/utils').getMostRecentBrowserWindow();
   var canvas = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
   window = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIWebNavigation)
