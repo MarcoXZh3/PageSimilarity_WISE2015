@@ -6,7 +6,7 @@ const prefs = Cc["@mozilla.org/preferences-service;1"].
                 getService(Ci.nsIPrefService).
                 getBranch("extensions.GestaltPS.");
 prefs.setCharPref("TopSites", require("./preferences.js").prefGestaltPS);
-var links = prefs.getCharPref("TopSites").split(" ");
+var links = prefs.getCharPref("TopSites").split("~~");
 var counter = 1, total = links.length;
 
 //TODO: read database to assign values to "links", and set proper size to splice the "links" into "urls"

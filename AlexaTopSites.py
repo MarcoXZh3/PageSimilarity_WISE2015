@@ -178,31 +178,43 @@ def crawlPage(url, pageExts):
     return set()
 # def crawlPage(url, pageExts)
 
-def getLinks():
-  conn = sqlite3.connect("E:\\webpages.db")
+def getLinks(number):
+  conn = sqlite3.connect("databases/webpages.db")
   c = conn.cursor()
-  f = open("E:\\preferences.txt", "w")
+  f = open("GestaltPS/lib/preferences.js", "w")
   f.write("const prefGestaltPS =\n")
+  count = 1
 
   # Query level 0 links
   c.execute("SELECT * FROM pages0_150327;")
   urls = c.fetchall()
   for url in urls:
-    f.write("  \"%s \" +\n" % repr(url[2])[2:-1])
+    if (count == number):
+      f.write("exports.prefGestaltPS = prefGestaltPS;\n")
+      f.close()
+      return
+    u = repr(url[2])[2:-1]
+    if "\\x" not in u and "\\u" not in u:
+      f.write("  \"%s~~\" +\n" % u)
+      count += 1
 
   # Query level 1 links
   c.execute("SELECT * FROM pages1_150328;")
   urls = c.fetchall()
   for url in urls:
-    if url == urls[-1]:
-      f.write("  \"%s\";\n\n" % repr(url[1])[2:-1])
-    else:
-      f.write("  \"%s \" +\n" % repr(url[1])[2:-1])
+    if (count == number):
+      f.write("exports.prefGestaltPS = prefGestaltPS;\n")
+      f.close()
+      return
+    u = repr(url[1])[2:-1]
+    if "\\x" not in u and "\\u" not in u:
+      f.write("  \"%s~~\" +\n" % u)
+      count += 1
 
   f.write("exports.prefGestaltPS = prefGestaltPS;\n")
   f.close()
   
-# def getLinks()
+# def getLinks(number)
 
 if __name__ == "__main__":
   pageExts = [".html", ".htm", ".php", ".jsp", ".asp", ".aspx", ".c", ".srf", ""]
@@ -238,5 +250,5 @@ if __name__ == "__main__":
   #updateIndex("pages2_150330")
 
   # Step 7: get all urls
-  getLinks();
+  getLinks(4096);
 # if __name__ == "__main__"
