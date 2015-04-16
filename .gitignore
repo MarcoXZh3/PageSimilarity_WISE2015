@@ -3,3 +3,6 @@
 
 # Database for testing
 databases
+
+# Firefox add-on preferences
+GestaltPS/lib/preferences*.js
