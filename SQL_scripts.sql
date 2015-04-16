@@ -92,3 +92,9 @@ pages1_150328     wp.pages0_150327  wp.pages2_150330
 INSERT INTO pages0_150327 SELECT * FROM wp.pages0_150327;
 INSERT INTO pages1_150328 SELECT * FROM wp.pages1_150328;
 INSERT INTO pages2_150330 SELECT * FROM wp.pages2_150330;
+
+
+-- Improper websites:
+DELETE FROM pages0_150327 WHERE url LIKE '%chaturbate%';
+DELETE FROM pages1_150328 WHERE url LIKE '%chaturbate%';
+DELETE FROM pages2_150330 WHERE url LIKE '%chaturbate%';
