@@ -178,13 +178,15 @@ def crawlPage(url, pageExts):
     return set()
 # def crawlPage(url, pageExts)
 
-def getLinks(step, numbers):
+def getLinks(step):
   conn = sqlite3.connect("databases/webpages.db")
   c = conn.cursor()
+  c.execute("SELECT * FROM pages1_150328 ORDER BY number DESC LIMIT 1;")
+  numbers = c.fetchone()[0]
   end = numbers / step + 1 if numbers % step != 0 else numbers / step
   links = []
   for i in range(0, end):
-    c.execute("SELECT * FROM pages2_150330 WHERE number > %d AND number <= %d;" % (i * step, (i + 1) * step))
+    c.execute("SELECT * FROM pages1_150328 WHERE number > %d AND number <= %d;" % (i * step, (i + 1) * step))
     urls = c.fetchall()
     links.append(urls[random.randint(0, len(urls)- 1)])
     print "%d/%d" % (i, end)
@@ -199,7 +201,12 @@ def getLinks(step, numbers):
   # for link in links
   f.write("exports.prefGestaltPS = prefGestaltPS;\n")
   f.close()
-# def getLinks(step, numbers)
+# def getLinks(step)
+
+def clearFiles(path):
+  print path
+  print os.path.join(os.getcwd(), "databases", "round1")
+# def clearFiles(path)
 
 if __name__ == "__main__":
   pageExts = [".html", ".htm", ".php", ".jsp", ".asp", ".aspx", ".c", ".srf", ""]
@@ -234,10 +241,9 @@ if __name__ == "__main__":
   #updateIndex("pages1_150328")
   #updateIndex("pages2_150330")
 
-  # Step 7: get all urls
-  conn = sqlite3.connect("databases/webpages.db")
-  c = conn.cursor()
-  c.execute("SELECT * FROM pages2_150330 ORDER BY number DESC LIMIT 1;")
-  numbers = c.fetchone()[0]
-  getLinks(4096, numbers);
+  # Step 7: get sample urls
+  #getLinks(64)
+
+  # Step 8: clear files so only PNG and corresponding TXT dump left
+  clearFiles()
 # if __name__ == "__main__"
