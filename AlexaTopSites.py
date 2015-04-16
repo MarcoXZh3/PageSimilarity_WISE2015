@@ -178,6 +178,32 @@ def crawlPage(url, pageExts):
     return set()
 # def crawlPage(url, pageExts)
 
+def getLinks():
+  conn = sqlite3.connect("E:\\webpages.db")
+  c = conn.cursor()
+  f = open("E:\\preferences.txt", "w")
+  f.write("const prefGestaltPS =\n")
+
+  # Query level 0 links
+  c.execute("SELECT * FROM pages0_150327;")
+  urls = c.fetchall()
+  for url in urls:
+    f.write("  \"%s \" +\n" % repr(url[2])[2:-1])
+
+  # Query level 1 links
+  c.execute("SELECT * FROM pages1_150328;")
+  urls = c.fetchall()
+  for url in urls:
+    if url == urls[-1]:
+      f.write("  \"%s\";\n\n" % repr(url[1])[2:-1])
+    else:
+      f.write("  \"%s \" +\n" % repr(url[1])[2:-1])
+
+  f.write("exports.prefGestaltPS = prefGestaltPS;\n")
+  f.close()
+  
+# def getLinks()
+
 if __name__ == "__main__":
   pageExts = [".html", ".htm", ".php", ".jsp", ".asp", ".aspx", ".c", ".srf", ""]
   # Django's validator
@@ -210,4 +236,7 @@ if __name__ == "__main__":
   #updateIndex("pages0_150327")
   #updateIndex("pages1_150328")
   #updateIndex("pages2_150330")
+
+  # Step 7: get all urls
+  getLinks();
 # if __name__ == "__main__"
