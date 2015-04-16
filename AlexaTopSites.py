@@ -6,6 +6,7 @@ Created on Mar 28, 2015
 import requests, urllib2, sqlite3, os, re, random
 from urlparse import urlparse
 from lxml import html
+from msilib import Directory
 
 
 def getTopSites(number):
@@ -203,10 +204,22 @@ def getLinks(step):
   f.close()
 # def getLinks(step)
 
-def clearFiles(path):
-  print path
-  print os.path.join(os.getcwd(), "databases", "round1")
-# def clearFiles(path)
+def clearFiles(directory):
+  path = os.path.join("E:\\", "databases", directory)
+  files = os.listdir(path)
+  files.sort()
+  index = 0
+  while index < len(files):
+    if files[index][:-4] == files[index+1][:-4] and os.path.getsize(os.path.join(path, files[index])) != 0L:
+      files.pop(index+1)
+      files.pop(index)
+    else:
+      index += 1
+  # while index < len(files)
+  print len(files)
+  for i in range(0, len(files)):
+    os.rename(os.path.join(path, files[i]), os.path.join(path, "%d.%s" % (i, files[i][-3:])))
+# def clearFiles(directory)
 
 if __name__ == "__main__":
   pageExts = [".html", ".htm", ".php", ".jsp", ".asp", ".aspx", ".c", ".srf", ""]
@@ -245,5 +258,6 @@ if __name__ == "__main__":
   #getLinks(64)
 
   # Step 8: clear files so only PNG and corresponding TXT dump left
-  clearFiles()
+  #clearFiles("round1")
+  clearFiles("round2")
 # if __name__ == "__main__"
