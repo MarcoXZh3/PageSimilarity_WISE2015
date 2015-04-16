@@ -3,7 +3,7 @@ Created on Mar 28, 2015
 
 @author: MarcoXZh
 '''
-import requests, urllib2, sqlite3, os, re
+import requests, urllib2, sqlite3, os, re, random
 from urlparse import urlparse
 from lxml import html
 
@@ -178,43 +178,28 @@ def crawlPage(url, pageExts):
     return set()
 # def crawlPage(url, pageExts)
 
-def getLinks(number):
+def getLinks(step, numbers):
   conn = sqlite3.connect("databases/webpages.db")
   c = conn.cursor()
+  end = numbers / step + 1 if numbers % step != 0 else numbers / step
+  links = []
+  for i in range(0, end):
+    c.execute("SELECT * FROM pages2_150330 WHERE number > %d AND number <= %d;" % (i * step, (i + 1) * step))
+    urls = c.fetchall()
+    links.append(urls[random.randint(0, len(urls)- 1)])
+    print "%d/%d" % (i, end)
+  # for i in range(0, end)
+
   f = open("GestaltPS/lib/preferences.js", "w")
   f.write("const prefGestaltPS =\n")
-  count = 1
-
-  # Query level 0 links
-  c.execute("SELECT * FROM pages0_150327;")
-  urls = c.fetchall()
-  for url in urls:
-    if (count == number):
-      f.write("exports.prefGestaltPS = prefGestaltPS;\n")
-      f.close()
-      return
-    u = repr(url[2])[2:-1]
+  for link in links:
+    u = repr(link[1])[2:-1]
     if "\\x" not in u and "\\u" not in u:
       f.write("  \"%s~~\" +\n" % u)
-      count += 1
-
-  # Query level 1 links
-  c.execute("SELECT * FROM pages1_150328;")
-  urls = c.fetchall()
-  for url in urls:
-    if (count == number):
-      f.write("exports.prefGestaltPS = prefGestaltPS;\n")
-      f.close()
-      return
-    u = repr(url[1])[2:-1]
-    if "\\x" not in u and "\\u" not in u:
-      f.write("  \"%s~~\" +\n" % u)
-      count += 1
-
+  # for link in links
   f.write("exports.prefGestaltPS = prefGestaltPS;\n")
   f.close()
-  
-# def getLinks(number)
+# def getLinks(step, numbers)
 
 if __name__ == "__main__":
   pageExts = [".html", ".htm", ".php", ".jsp", ".asp", ".aspx", ".c", ".srf", ""]
@@ -250,5 +235,9 @@ if __name__ == "__main__":
   #updateIndex("pages2_150330")
 
   # Step 7: get all urls
-  getLinks(4096);
+  conn = sqlite3.connect("databases/webpages.db")
+  c = conn.cursor()
+  c.execute("SELECT * FROM pages2_150330 ORDER BY number DESC LIMIT 1;")
+  numbers = c.fetchone()[0]
+  getLinks(4096, numbers);
 # if __name__ == "__main__"

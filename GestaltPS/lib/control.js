@@ -39,8 +39,8 @@ const register = (panel) => {
   Hotkey({combo: "control-alt-f", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcomf"); }});
   panel.port.on("click-LI-glmcon", function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); });
   Hotkey({combo: "control-alt-c", onPress: function() { GestaltPS_Handler(panel, "handler-LI-glmcon"); }});
-  panel.port.on("click-LI-screenshot", function() { panel.hide(); Batch_Screenshot(webpages, 3); });
-  Hotkey({combo: "control-alt-r", onPress: function() { panel.hide(); Batch_Screenshot(webpages, 3); }});
+  panel.port.on("click-LI-screenshot", function() { panel.hide(); Batch_Screenshot(webpages, 8); });
+  Hotkey({combo: "control-alt-r", onPress: function() { panel.hide(); Batch_Screenshot(webpages, 8); }});
 }; // const register = (panel) => { ... };
 
 const GestaltPS_Handler = (panel, event) => {
