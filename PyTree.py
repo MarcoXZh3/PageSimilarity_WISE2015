@@ -327,6 +327,57 @@ class PyTree(object):
         return 0 if self.root is None else self.__subtreeSize(self.root)
     pass # def treeSize(self)
 
+    def __preOrderTraverse(self, root):
+        '''
+        Traverse the subtree and return node list pre-orderly
+        Assume the parameter is valid
+            @param root:     {PyTreeNode} the root of the subtree
+            @return:         {List} node list of the subtree
+        '''
+        lst = [root]
+        for child in root.children:
+            lst += self.__preOrderTraverse(child)
+        return lst
+    pass # def __preOrderTraverse(self, root)
+
+    def preOrderTraverse(self):
+        '''
+        Traverse the tree and return node list pre-orderly
+            @return:         {List} node list of the tree
+        '''
+        return [] if self.root is None else self.__preOrderTraverse(self.root)
+    pass # def preOrderTraverse(self)
+
+    def __postOrderTraverse(self, root):
+        '''
+        Traverse the subtree and return node list post-orderly
+        Assume the parameter is valid
+            @param root:     {PyTreeNode} the root of the subtree
+            @return:         {List} node list of the subtree
+        '''
+        lst = []
+        for child in root.children:
+            lst += self.__postOrderTraverse(child)
+        lst.append(root)
+        return lst
+    pass # def __postOrderTraverse(self, root)
+
+    def postOrderTraverse(self):
+        '''
+        Traverse the tree and return node list post-orderly
+            @return:         {List} node list of the tree
+        '''
+        return [] if self.root is None else self.__postOrderTraverse(self.root)
+    pass # def postOrderTraverse(self)
+
+    def breadFirstTraverse(self):
+        '''
+        Traverse the tree and return node list bread-firstly
+            @param root:     {PyTreeNode} the root of the subtree
+            @return:         {List} node list of the tree
+        '''
+    pass # def breadFirstTraverse(self)
+
     def __strSubtree(self, root, depth):
         '''
         Cast the tree into string representation
@@ -528,6 +579,10 @@ if __name__ == '__main__':
   | |-c26: parent=c13, prev=c25, next=None; children(0)[]: first=None, last=None
 ================ PyTree:'Tree' ================
     '''
+    pre = tree.preOrderTraverse()
+    print [x.nodeName for x in pre]
+    post = tree.postOrderTraverse()
+    print [x.nodeName for x in post]
     print tree.contains(root)                       # True
     print tree.contains(c25)                        # True
     print tree.contains(nonNode)                    # False
@@ -563,9 +618,14 @@ if __name__ == '__main__':
     print tree.isEmpty()                            # True
     print tree.empty()                              # True
     print tree                                      # {Empty}
+    pre = tree.preOrderTraverse()
+    print [x.nodeName for x in pre]
+    post = tree.postOrderTraverse()
+    print [x.nodeName for x in post]
     print tree.isEmpty()                            # True
     print tree.contains(root)                       # False
     print tree.contains(nonNode)                    # False
     print tree.contains(None)                       # False
     print tree.treeSize()                           # 0
+
 pass # if __name__ == '__main__':
