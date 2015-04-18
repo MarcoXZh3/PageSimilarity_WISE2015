@@ -6,7 +6,6 @@ Created on Mar 28, 2015
 import requests, urllib2, sqlite3, os, re, random
 from urlparse import urlparse
 from lxml import html
-from msilib import Directory
 
 
 def getTopSites(number):
