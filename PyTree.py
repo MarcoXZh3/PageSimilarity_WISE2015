@@ -370,13 +370,45 @@ class PyTree(object):
         return [] if self.root is None else self.__postOrderTraverse(self.root)
     pass # def postOrderTraverse(self)
 
-    def breadFirstTraverse(self):
+    def depthFirstTraverse(self):
+        '''
+        Traverse the tree and return node list depth-firstly -- this is the same with pre-order traversal
+            @param root:     {PyTreeNode} the root of the subtree
+            @return:         {List} node list of the tree
+        '''
+        if self.root is None:
+            return []
+        queue = [self.root]
+        lst = []
+        curNode = None
+        while len(queue) > 0:
+            curNode = queue.pop()
+            lst.append(curNode)
+            for i in range(len(curNode.children) - 1, -1, -1):
+                queue.append(curNode.children[i])
+        pass # while len(queue) > 0
+        return lst
+    pass # def depthFirstTraverse(self)
+
+    def breadthFirstTraverse(self):
         '''
         Traverse the tree and return node list bread-firstly
             @param root:     {PyTreeNode} the root of the subtree
             @return:         {List} node list of the tree
         '''
-    pass # def breadFirstTraverse(self)
+        if self.root is None:
+            return []
+        queue = [self.root]
+        lst = []
+        curNode = None
+        while len(queue) > 0:
+            curNode = queue.pop()
+            lst.append(curNode)
+            for child in curNode.children:
+                queue.insert(0, child)
+        pass # while len(queue) > 0
+        return lst
+    pass # def breadthFirstTraverse(self)
 
     def __strSubtree(self, root, depth):
         '''
@@ -583,6 +615,10 @@ if __name__ == '__main__':
     print [x.nodeName for x in pre]
     post = tree.postOrderTraverse()
     print [x.nodeName for x in post]
+    depth = tree.depthFirstTraverse()
+    print [x.nodeName for x in depth]
+    breadth = tree.breadthFirstTraverse()
+    print [x.nodeName for x in breadth]
     print tree.contains(root)                       # True
     print tree.contains(c25)                        # True
     print tree.contains(nonNode)                    # False
@@ -622,6 +658,10 @@ if __name__ == '__main__':
     print [x.nodeName for x in pre]
     post = tree.postOrderTraverse()
     print [x.nodeName for x in post]
+    depth = tree.depthFirstTraverse()
+    print [x.nodeName for x in depth]
+    breadth = tree.breadthFirstTraverse()
+    print [x.nodeName for x in breadth]
     print tree.isEmpty()                            # True
     print tree.contains(root)                       # False
     print tree.contains(nonNode)                    # False
