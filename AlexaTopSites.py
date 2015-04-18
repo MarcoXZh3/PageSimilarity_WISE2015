@@ -259,5 +259,5 @@ if __name__ == "__main__":
 
   # Step 8: clear files so only PNG and corresponding TXT dump left
   #clearFiles("round1")
-  clearFiles("round2")
+  #clearFiles("all")
 # if __name__ == "__main__"

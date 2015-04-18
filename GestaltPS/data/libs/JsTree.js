@@ -117,7 +117,7 @@ function JsTreeNode(name) {
     newChild.parent = this;
     if (index === 0)
       this.firstChild = newChild;
-    else if (index === this.childCount - 1)
+    if (index === this.childCount - 1)
       this.lastChild = newChild;
     newChild.previousSibling = curChild.previousSibling;
     newChild.nextSibling = curChild.nextSibling;
