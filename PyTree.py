@@ -373,7 +373,6 @@ class PyTree(object):
     def depthFirstTraverse(self):
         '''
         Traverse the tree and return node list depth-firstly -- this is the same with pre-order traversal
-            @param root:     {PyTreeNode} the root of the subtree
             @return:         {List} node list of the tree
         '''
         if self.root is None:
@@ -393,7 +392,6 @@ class PyTree(object):
     def breadthFirstTraverse(self):
         '''
         Traverse the tree and return node list bread-firstly
-            @param root:     {PyTreeNode} the root of the subtree
             @return:         {List} node list of the tree
         '''
         if self.root is None:
