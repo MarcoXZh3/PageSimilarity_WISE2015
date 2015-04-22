@@ -98,3 +98,6 @@ INSERT INTO pages2_150330 SELECT * FROM wp.pages2_150330;
 DELETE FROM pages0_150327 WHERE url LIKE '%chaturbate%';
 DELETE FROM pages1_150328 WHERE url LIKE '%chaturbate%';
 DELETE FROM pages2_150330 WHERE url LIKE '%chaturbate%';
+DELETE FROM pages0_150327 WHERE url LIKE '%privatehomeclips%';
+DELETE FROM pages1_150328 WHERE url LIKE '%privatehomeclips%';
+DELETE FROM pages2_150330 WHERE url LIKE '%privatehomeclips%';

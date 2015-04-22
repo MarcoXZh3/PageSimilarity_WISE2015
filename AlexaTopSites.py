@@ -197,7 +197,7 @@ def getLinks(step):
         links.append(urls[random.randint(0, len(urls)- 1)])
         print '%d/%d' % (i, end)
     pass # for i in range(0, end)
-    
+
     f = open('GestaltPS/lib/preferences.js', 'w')
     f.write('const prefGestaltPS =\n')
     for link in links:
@@ -210,7 +210,7 @@ def getLinks(step):
 pass # def getLinks(step)
 
 def clearFiles(directory):
-    path = os.path.join('E:\\', 'databases', directory)
+    path = os.path.join('databases', directory)
     files = os.listdir(path)
     files.sort()
     index = 0
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     #getTopSites(500)
 
     # Step 2(Manually): remove improper sites and mark duplications
-    
+
     # Stop 3: Crawl all direct links from the top 500 sites - Level 1
     #crawlPagesLevel1(pageExts)
 
@@ -265,6 +265,5 @@ if __name__ == '__main__':
     #getLinks(64)
 
     # Step 8: clear files so only PNG and corresponding TXT dump left
-    #clearFiles('round1')
     #clearFiles('all')
 pass # if __name__ == '__main__'
