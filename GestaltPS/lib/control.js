@@ -90,12 +90,16 @@ const GestaltPS_Handler = (panel, event) => {
 const Batch_Screenshot = (links, number) => {
   var urls = links.splice(0, number);
   for (i in urls)
-    tabs.open({ url: urls[i], onLoad: function(tab) { try{ Screenshot(tab); } catch(err) { tab.close(); } } });
+    tabs.open({ url: urls[i],
+                inBackground: true,
+                onLoad: function(tab) { try{ Screenshot(tab); } catch(err) { tab.close(); } } });
   tabs.on("close", function(){
     if (links.length <= 0)
       return ;
     url = links.splice(0, 1);
-    tabs.open({ url: url[0], onLoad: function(tab) { try{ Screenshot(tab); } catch(err) { tab.close(); } } });
+    tabs.open({ url: url[0],
+                inBackground: true,
+                onLoad: function(tab) { try{ Screenshot(tab); } catch(err) { tab.close(); } } });
   }); // tabs.on("close", function(){ ... });
 }; // const Batch_Screenshot = (links, number) => { ... };
 
