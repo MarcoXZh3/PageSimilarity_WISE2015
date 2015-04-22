@@ -18,18 +18,13 @@ function LayerTreeNode(node, name) {
   } // while (child)
   this.text = str.trim().replace(/\n/g, " ");
 
-  this.top = (!node) ? -1 : node.offsetTop;
-  this.left = (!node) ? -1 : node.offsetLeft;
-  this.width = (!node) ? -1 : node.offsetWidth;
-  this.height = (!node) ? -1 : node.offsetHeight;
+  var rect = (!node) ? null : node.getBoundingClientRect();
+  this.top = (!rect) ? 0 : Math.round(rect.top);
+  this.left = (!rect) ? 0 : Math.round(rect.left);
+  this.width = (!rect) ? 0 : Math.round(rect.width);
+  this.height = (!rect) ? 0 : Math.round(rect.height);
   this.css = {};
   if (node) {
-    var parent = node.offsetParent;
-    while (parent) {
-      this.top += parent.offsetTop;
-      this.left += parent.offsetLeft;
-      parent = parent.offsetParent;
-    } // while (parent)
     for (i in properties) {
       var style = document.defaultView.getComputedStyle(node).getPropertyValue(properties[i]);
       style = (!style) ? "" : style.trim();
