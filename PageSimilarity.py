@@ -6,7 +6,6 @@ Created on Apr 16, 2015
 import os, math, collections, zss, pylzma
 from PIL import Image
 from BlockTree import BlockTree
-import random
 
 
 def PNGConverter():
@@ -232,12 +231,15 @@ if __name__ == '__main__':
     for i, f in enumerate(files):
         for j in range(i + 1, number):
             step = {}
+
             # Calculate NCD
             clen1, clen2 = data[i]['clen'], data[j]['clen']
             step['ncd'] = 1.0 * (len(pylzma.compress(data[i]['byte'] + data[j]['byte'])) - min(clen1, clen2)) \
                               / max(clen1, clen2)
+
             # Calculate tree edit distance
-            step['ted'] = zss.simple_distance(data[i]['etree'] + data[j]['etree'])
+            step['ted'] = zss.simple_distance(data[i]['etree'], data[j]['etree'])
+
             # Calculate color histogram distances
             hellingerDistance = 0.0
             bhattacharyyaDistance = 0.0
@@ -255,8 +257,10 @@ if __name__ == '__main__':
             hellingerDistance = (hellingerDistance / 2.0) ** 0.5
             bhattacharyyaDistance = -math.log(bhattacharyyaDistance)
             step['hist'] = [hellingerDistance, bhattacharyyaDistance, totalVariationDistance]
+
+            # Write down results
             print 'Calculating: %4d, %4d / %4d' % (i, j, number)
-            f.write('%4d,%4d:%s\n' % (i, j, step))
+            fResult.write('%4d,%4d:%s\n' % (i, j, step))
     pass # for - for
-    f.close()
+    fResult.close()
 pass # if __name__ == '__main__'
