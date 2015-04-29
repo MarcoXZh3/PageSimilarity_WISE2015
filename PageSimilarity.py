@@ -167,10 +167,8 @@ def fileStatistics():
     fw.close()
 pass # def fileStatistics()
 
-def pageSimilarity(btr1, btr2):
-    if page1 is None or len(page1) == 0 or page2 is None or len(page2) == 0:
-        return -1.0
-    img1, img2 = Image.open('databases/%s.png' % page1), Image.open('databases/%s.png' % page2)
+def pageSimilarity(page1, page2):
+    img1, img2 = Image.open(page1), Image.open(page2)
     print img1.size, img2.size
     btr1 = BlockTree.parseBlockTreeFromFile('databases/%s.txt' % page1)
     btr2 = BlockTree.parseBlockTreeFromFile('databases/%s.txt' % page2)
@@ -194,11 +192,23 @@ if __name__ == '__main__':
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
 
-    page1 = 'http%3A%E2%E2finance.ifeng.com%E2intellect%E2'
-    page2 = 'http%3A%E2%E2www.gome.com.cn%E2category%E2cat10000053.htm'
-
-    #print fileNCD('databases/PNG/%s.png' % page1, 'databases/PNG/%s.png' % page2)
-    #print treeEditDistance('databases/TXT/%s.txt' % page1, 'databases/TXT/%s.txt' % page2)
-    #print histogramDistance('databases/HISTO/%s.txt' % page1, 'databases/HISTO/%s.txt' % page2)
-
+    files = os.listdir('databases/PNG/')[:2]
+    files.sort()
+    number = len(files)
+    re = []
+    for i, f in enumerate(files):
+        f = f[:-4]
+        for j in range(i + 1, number):
+            g = files[j][:-4]
+            step = {}
+            step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % g)
+            step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % g)
+            step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % g)
+            print '%4d, %4d / %4d' % (i, j, number)
+            re.append((i, j, step))
+        pass # for j in range(i + 1, number)
+    f = open('databases/results.txt', 'w')
+    for x in re:
+        f.write('%4d, %4d: %s\n' % (x[0], x[1], x[2]))
+    f.close()
 pass # if __name__ == '__main__'
