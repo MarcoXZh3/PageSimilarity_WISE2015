@@ -6,6 +6,7 @@ Created on Apr 16, 2015
 import os, math, collections, zss, pylzma
 from PIL import Image
 from BlockTree import BlockTree
+import random
 
 
 def PNGConverter():
@@ -192,23 +193,70 @@ if __name__ == '__main__':
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
 
+    def builupTree(root):
+        tree = zss.Node(root.nodeName)
+        for child in root.children:
+            tree.addkid(builupTree(child))
+        return tree
+    pass # def builupTree(root)
+
     files = os.listdir('databases/PNG/')
     files.sort()
+    files = [f[:-4] for f in files]
+
     number = len(files)
-    re = []
+    data = []
     for i, f in enumerate(files):
-        f = f[:-4]
+        d = {}
+        #d['url'] = f
+        d['img'] = Image.open('databases/PNG/%s.png' % f)
+        d['byte'] = open('databases/PNG/%s.png' % f, 'rb').read()
+        d['clen'] = len(pylzma.compress(d['byte']))
+        d['btree'] = BlockTree.parseBlockTreeFromFile('databases/TXT/%s.txt' % f)
+        d['etree'] = builupTree(d['btree'].root)
+        hist = {}
+        size = 0.0
+        for j, line in enumerate(open('databases/HISTO/%s.txt' % f, 'r')):
+            line = line.strip().split(',')
+            if j == 0:
+                size = float(line[0]) * float(line[1])
+            else:
+                hist[line[0]] = float(line[1]) / size
+        pass # for j, line in enumerate(open('databases/HISTO/%s.txt' % f, 'r'))
+        d['hist'] = hist
+        print 'Reading data: %4d / %4d' % (i, number)
+        data.append(d)
+    pass # for i, f in enumerate(files)
+
+    fResult = open('databases/results.txt', 'w')
+    for i, f in enumerate(files):
         for j in range(i + 1, number):
-            g = files[j][:-4]
             step = {}
-            step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % g)
-            step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % g)
-            step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % g)
-            print '%4d, %4d / %4d' % (i, j, number)
-            re.append((i, j, step))
-        pass # for j in range(i + 1, number)
-    f = open('databases/results.txt', 'w')
-    for x in re:
-        f.write('%4d, %4d: %s\n' % (x[0], x[1], x[2]))
+            # Calculate NCD
+            clen1, clen2 = data[i]['clen'], data[j]['clen']
+            step['ncd'] = 1.0 * (len(pylzma.compress(data[i]['byte'] + data[j]['byte'])) - min(clen1, clen2)) \
+                              / max(clen1, clen2)
+            # Calculate tree edit distance
+            step['ted'] = zss.simple_distance(data[i]['etree'] + data[j]['etree'])
+            # Calculate color histogram distances
+            hellingerDistance = 0.0
+            bhattacharyyaDistance = 0.0
+            totalVariationDistance = 0.0
+            colors = list(set(data[i]['hist'].keys() + data[j]['hist'].keys()))
+            for c in colors:
+                count1, count2 = data[i]['hist'].get(c), data[j]['hist'].get(c)
+                if count1 is None:  count1 = 0.0
+                if count2 is None:  count2 = 0.0
+                hellingerDistance += (count1 ** 0.5 - count2 ** 0.5) ** 2
+                bhattacharyyaDistance += (count1 * count2) ** 0.5
+                if totalVariationDistance < math.fabs(count1 - count2):
+                    totalVariationDistance = math.fabs(count1 - count2)
+            pass # for c in colors
+            hellingerDistance = (hellingerDistance / 2.0) ** 0.5
+            bhattacharyyaDistance = -math.log(bhattacharyyaDistance)
+            step['hist'] = [hellingerDistance, bhattacharyyaDistance, totalVariationDistance]
+            print 'Calculating: %4d, %4d / %4d' % (i, j, number)
+            f.write('%4d,%4d:%s\n' % (i, j, step))
+    pass # for - for
     f.close()
 pass # if __name__ == '__main__'
