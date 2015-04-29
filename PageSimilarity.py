@@ -192,7 +192,7 @@ if __name__ == '__main__':
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
 
-    files = os.listdir('databases/PNG/')[:2]
+    files = os.listdir('databases/PNG/')
     files.sort()
     number = len(files)
     re = []
