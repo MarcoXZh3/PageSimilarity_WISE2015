@@ -183,15 +183,11 @@ def pageSimilarity(page1, page2):
     return ps
 pass # def pageSimilarity(btr1, btr2)
 
-
-if __name__ == '__main__':
-    # Convert the samples
-    #PNGConverter()
-    # Calculate color histograms
-    #RGBhistogram()
-    # File statistics: file size, compressed size and file name (URL)
-    #fileStatistics()
-
+def readData():
+    '''
+    Read necessary data
+    @return:     {List} data list
+    '''
     def builupTree(root):
         tree = zss.Node(root.nodeName)
         for child in root.children:
@@ -202,7 +198,6 @@ if __name__ == '__main__':
     files = os.listdir('databases/PNG/')
     files.sort()
     files = [f[:-4] for f in files]
-
     number = len(files)
     data = []
     for i, f in enumerate(files):
@@ -226,7 +221,18 @@ if __name__ == '__main__':
         print 'Reading data: %4d / %4d' % (i, number)
         data.append(d)
     pass # for i, f in enumerate(files)
+    return data
+pass # def readData()
 
+def process(data):
+    '''
+    Process the data
+    @param data:     {List} data list
+    '''
+    files = os.listdir('databases/PNG/')
+    files.sort()
+    files = [f[:-4] for f in files]
+    number = len(files)
     fResult = open('databases/results.txt', 'w')
     for i, f in enumerate(files):
         for j in range(i + 1, number):
@@ -263,4 +269,16 @@ if __name__ == '__main__':
             fResult.write('%4d,%4d:%s\n' % (i, j, step))
     pass # for - for
     fResult.close()
+pass # def process(data)
+
+if __name__ == '__main__':
+    # Convert the samples
+    #PNGConverter()
+    # Calculate color histograms
+    #RGBhistogram()
+    # File statistics: file size, compressed size and file name (URL)
+    #fileStatistics()
+
+    data = readData()
+    process(data)
 pass # if __name__ == '__main__'
