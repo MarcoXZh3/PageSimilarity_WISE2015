@@ -277,8 +277,17 @@ if __name__ == '__main__':
 
     files = os.listdir('databases/PNG/')
     files.sort()
-    files = [f[:-4] for f in files]
-
-    data = readData(files)
-    process(files, data)
+    files = [f[:-4] for f in files][:500]
+    number = len(files)
+    fResult = open('databases/results.txt', 'w')
+    for i, f in enumerate(files):
+        for j in range(i + 1, number):
+            step = {}
+            step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
+            step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
+            step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+            print '%4d, %4d / %4d' % (i, j, number)
+            fResult.write('%d,%d:%s\n' % (i, j, step))
+    pass # for - for
+    fResult.close()
 pass # if __name__ == '__main__'
