@@ -183,10 +183,11 @@ def pageSimilarity(page1, page2):
     return ps
 pass # def pageSimilarity(btr1, btr2)
 
-def readData():
+def readData(files):
     '''
     Read necessary data
-    @return:     {List} data list
+    @param files:    {List} file list
+    @return:         {List} data list
     '''
     def builupTree(root):
         tree = zss.Node(root.nodeName)
@@ -195,9 +196,6 @@ def readData():
         return tree
     pass # def builupTree(root)
 
-    files = os.listdir('databases/PNG/')
-    files.sort()
-    files = [f[:-4] for f in files]
     number = len(files)
     data = []
     for i, f in enumerate(files):
@@ -222,19 +220,17 @@ def readData():
         data.append(d)
     pass # for i, f in enumerate(files)
     return data
-pass # def readData()
+pass # def readData(files)
 
-def process(data):
+def process(files, data):
     '''
     Process the data
+    @param files:    {List} file list
     @param data:     {List} data list
     '''
-    files = os.listdir('databases/PNG/')
-    files.sort()
-    files = [f[:-4] for f in files]
     number = len(files)
     fResult = open('databases/results.txt', 'w')
-    for i, f in enumerate(files):
+    for i in range(number):
         for j in range(i + 1, number):
             step = {}
 
@@ -269,7 +265,7 @@ def process(data):
             fResult.write('%4d,%4d:%s\n' % (i, j, step))
     pass # for - for
     fResult.close()
-pass # def process(data)
+pass # def process(files, data)
 
 if __name__ == '__main__':
     # Convert the samples
@@ -279,6 +275,10 @@ if __name__ == '__main__':
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
 
-    data = readData()
-    process(data)
+    files = os.listdir('databases/PNG/')
+    files.sort()
+    files = [f[:-4] for f in files]
+
+    data = readData(files)
+    process(files, data)
 pass # if __name__ == '__main__'
