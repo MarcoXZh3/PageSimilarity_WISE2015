@@ -167,6 +167,48 @@ def fileStatistics():
     fw.close()
 pass # def fileStatistics()
 
+def simLay(page1, page2, level):
+    if level <= 0:
+        return
+    # Load the two images
+    img = Image.open(page1)
+    img1 = Image.new('RGB', (1024, 1024), '#FFF')
+    img1.paste(img, ((1024 - img.size[0]) / 2, 0))
+    #img1.show()
+    img = Image.open(page2)
+    img2 = Image.new('RGB', (1024, 1024), '#FFF')
+    img2.paste(img, ((1024 - img.size[0]) / 2, 0))
+    #img2.show()
+
+    # Calculation
+    v = []
+    for i in range(level):
+        width = 1024 / (2 ** i)
+        value = 0.0
+        for j in range(2 ** i):
+            for k in range(2 ** i):
+#                 count1, count2 = set(), set()
+                c = 0
+                pix1 = img1.crop((k * width, j * width, (k + 1) * width, (j + 1) * width)).load()
+                pix2 = img2.crop((k * width, j * width, (k + 1) * width, (j + 1) * width)).load()
+                for m in range(width):
+                    for n in range(width):
+                        if pix1[m, n] == pix2[m, n]:
+                            c += 1
+#                         count1.add(pix1[m, n])
+#                         count2.add(pix2[m, n])
+                pass # for -for
+                value += 1.0 * c#min(len(count1), len(count2))
+        pass # for - for
+        v.append(value)
+    pass # for i in range(level)
+
+    re = v[-1]
+    for i in range(level - 1):
+        re += (v[i] - v[i + 1]) / (2.0 ** (level - i))
+    return re
+pass # def simLay(page1, page2)
+
 def pageSimilarity(page1, page2):
     img1, img2 = Image.open(page1), Image.open(page2)
     print img1.size, img2.size
@@ -277,15 +319,16 @@ if __name__ == '__main__':
 
     files = os.listdir('databases/PNG/')
     files.sort()
-    files = [f[:-4] for f in files][:500]
+    files = [f[:-4] for f in files]
     number = len(files)
     fResult = open('databases/results.txt', 'w')
     for i, f in enumerate(files):
         for j in range(i + 1, number):
             step = {}
-            step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
-            step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
-            step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+#             step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
+#             step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
+#             step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+            step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
             print '%4d, %4d / %4d' % (i, j, number)
             fResult.write('%d,%d:%s\n' % (i, j, step))
     pass # for - for
