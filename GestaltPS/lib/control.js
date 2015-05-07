@@ -112,9 +112,10 @@ const Screenshot = (tab) => {
                                                   data.url("gestaltLM/GLM_Helper.js"),
                                                   data.url("gestaltLM/GestaltLaws.js"),
                                                   data.url("BlockTree.js"),
+                                                  data.url("DomTree.js"),
                                                   data.url("mpControl.js")]}); 
   worker.port.emit("handler-LI-screenshot", new Date().getTime());
-  worker.port.on("resp-LI-screenshot", function(time, msg) {
+  worker.port.on("resp-LI-screenshot", function(time, blockTree, domTree) {
     console.log((counter++) + "/" + total + ": " + tab.url);
 
     // Get the webpage screenshot as PNG image
@@ -139,12 +140,16 @@ const Screenshot = (tab) => {
 
     // Get the block tree dump as TXT
     const {TextDecoder, TextEncoder} = Cu.import("resource://gre/modules/osfile.jsm", {});
-    var encoder = new TextEncoder();
-    var array = encoder.encode(msg.substr(msg.indexOf("\n") + 1, msg.length));
-    var promise = OS.File.writeAtomic(OS.Path.join(OS.Constants.Path.desktopDir, filename + ".txt"), array,
-                                      {tmpPath: OS.Path.join(OS.Constants.Path.desktopDir, filename + ".tmp")});
+    var encoder1 = new TextEncoder();
+    var array1 = encoder1.encode(blockTree);
+    var promise1 = OS.File.writeAtomic(OS.Path.join(OS.Constants.Path.desktopDir, filename + "-BT.txt"), array1,
+                                       {tmpPath: OS.Path.join(OS.Constants.Path.desktopDir, filename + ".tmp")});
+    var encoder2 = new TextEncoder();
+    var array2 = encoder2.encode(domTree);
+    var promise2 = OS.File.writeAtomic(OS.Path.join(OS.Constants.Path.desktopDir, filename + "-DT.txt"), array2,
+                                       {tmpPath: OS.Path.join(OS.Constants.Path.desktopDir, filename + ".tmp")});
     tab.close();
-  }); // worker.port.on("resp-LI-screenshot", function(time, msg) { ... });
+  }); // worker.port.on("resp-LI-screenshot", function(time, blockTree, domTree) { ... });
 }; // const Screenshot = (tab) => { ... };
 
 exports.register = register;

@@ -131,5 +131,6 @@ self.port.on("handler-LI-screenshot", function(startTime) {
   var blockTree = new BlockTree(new BlockTreeNode([layerTree.root], "/0"), document.URL);
   blockTree.buildUpTree(layerTree);
   //blockTree.treeInPage();
-  self.port.emit("resp-LI-screenshot", new Date().getTime() - startTime, blockTree.toString());
+  var domTree = new DomTree(new DomTreeNode(document.body), document.URL);
+  self.port.emit("resp-LI-screenshot", new Date().getTime() - startTime, blockTree.toString(), domTree.toString());
 }); // self.port.on("handler-LI-screenshot", function(startTime) {...});
