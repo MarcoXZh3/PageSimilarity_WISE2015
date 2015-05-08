@@ -313,8 +313,10 @@ def updateBlockTree():
     pngs, btrs = os.listdir('databases/PNG/'), os.listdir('databases/BTREE/')
     pngs.sort()
     btrs.sort()
-    for btr in btrs:
-        print btr
+    number = len(btrs)
+    assert number == len(pngs)
+    for i, btr in enumerate(btrs):
+        print '%4d/%4d %s' % (i, number, btr)
         lines = []
         f = open('databases/BTREE/%s' % btr, 'r')
         for line in f:
@@ -339,7 +341,7 @@ def updateBlockTree():
             f.write('%s; %f\n' % (line, ncd))
         f.close()
         pass # for line in lines
-    pass # for btr in btrs
+    pass # for i, btr in enumerate(btrs)
 pass # def updateBlockTree()
 
 
@@ -351,7 +353,8 @@ if __name__ == '__main__':
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
     # Update Block Trees, set info to NCD
-    #updateBlockTree()
+    updateBlockTree()
+    exit(0)
 
     files = os.listdir('databases/PNG/')
     files.sort()
