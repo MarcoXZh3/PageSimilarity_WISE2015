@@ -3,7 +3,7 @@ Created on Apr 16, 2015
 @author: Marco
 '''
 
-import os, math, collections, zss, pylzma
+import os, math, collections, re, zss, pylzma
 from PIL import Image
 from BlockTree import BlockTree
 
@@ -309,6 +309,40 @@ def process(files, data):
     fResult.close()
 pass # def process(files, data)
 
+def updateBlockTree():
+    pngs, btrs = os.listdir('databases/PNG/'), os.listdir('databases/BTREE/')
+    pngs.sort()
+    btrs.sort()
+    for btr in btrs:
+        print btr
+        lines = []
+        f = open('databases/BTREE/%s' % btr, 'r')
+        for line in f:
+            lines.append(line.split(';')[0])
+        f.close()
+        img0 = Image.open('databases/PNG/%s.png' % btr[:-4])
+        f = open('databases/BTREE/%s' % btr, 'w')
+        for line in lines:
+            if line.startswith('================'):
+                f.write('%s\n' % line)
+                continue
+            pass # if line.startswith('================')
+            ncd = 1.0
+            try:
+                top, left, right, bottom = [int(x) for x in re.split('\D+', line)[1:]]
+                img0.crop((left, top, right, bottom)).save('databases/tmp-img1.png')
+                Image.new('RGB', ((right - left, bottom - top)), '#FFF').save('databases/tmp-img2.png')
+                ncd = fileNCD('databases/tmp-img1.png', 'databases/tmp-img2.png')
+            except:
+                pass
+            pass # try - except
+            f.write('%s; %f\n' % (line, ncd))
+        f.close()
+        pass # for line in lines
+    pass # for btr in btrs
+pass # def updateBlockTree()
+
+
 if __name__ == '__main__':
     # Convert the samples
     #PNGConverter()
@@ -316,6 +350,8 @@ if __name__ == '__main__':
     #RGBhistogram()
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
+    # Update Block Trees, set info to NCD
+    #updateBlockTree()
 
     files = os.listdir('databases/PNG/')
     files.sort()
