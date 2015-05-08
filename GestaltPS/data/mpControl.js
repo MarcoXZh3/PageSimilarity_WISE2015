@@ -38,8 +38,11 @@ self.port.on("handler-LI-similarity", function(startTime) {
  * Register event handlers of the menu item - "Layer Tree"
  */
 self.port.on("handler-LI-layertree", function(startTime) {
-  self.port.emit("resp-LI-layertree", new Date().getTime() - startTime,
-                 new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL).toString());
+  var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
+  var mergingResults = [];
+  getAllLaws(layerTree.root, mergingResults);
+  updatePage(mergingResults);
+  self.port.emit("resp-LI-layertree", new Date().getTime() - startTime, layerTree.toString());
 }); // self.port.on("handler-LI-layertree", function(startTime) {...});
 
 /**
@@ -49,7 +52,7 @@ self.port.on("handler-LI-blocktree", function(startTime) {
   var layerTree = new LayerTree(new LayerTreeNode(document.body, document.body.tagName), document.URL);
   var blockTree = new BlockTree(new BlockTreeNode([layerTree.root], "/0"), document.URL);
   blockTree.buildUpTree(layerTree);
-  //blockTree.treeInPage();
+  blockTree.treeInPage();
   self.port.emit("resp-LI-blocktree", new Date().getTime() - startTime, blockTree.toString());
 }); // self.port.on("handler-LI-blocktree", function(startTime) {...});
 
