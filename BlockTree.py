@@ -60,6 +60,8 @@ class BlockTree(PyTree):
         txts = open(filename, 'r')
         blockTree = BlockTree(name='', root=None)
         for line in txts:
+            if len(line.strip()) == 0:
+                continue
             if line.startswith('=='):
                 blockTree.treeName = line.split('"')[1]
                 break
@@ -93,7 +95,7 @@ class BlockTree(PyTree):
 
 pass # class BlockTree(object)
 
-#print BlockTree.parseBlockTreeFromFile('test.txt')
+#print BlockTree.parseBlockTreeFromFile('databases/http%3A%E2%E24travel.jp%E2.txt')
 
 # Text file looks like:
 #   top=0,left=0,right=1920,bottom=0; /0
