@@ -3,7 +3,7 @@ Created on Apr 16, 2015
 @author: Marco
 '''
 
-import os, math, collections, re, zss, pylzma
+import os, math, random, string, collections, re, base64, zss, pylzma
 from PIL import Image
 from BlockTree import BlockTree
 
@@ -210,19 +210,22 @@ def simLay(page1, page2, level):
 pass # def simLay(page1, page2)
 
 def pageSimilarity(page1, page2):
-    img1, img2 = Image.open(page1), Image.open(page2)
-    print img1.size, img2.size
-    btr1 = BlockTree.parseBlockTreeFromFile('databases/%s.txt' % page1)
-    btr2 = BlockTree.parseBlockTreeFromFile('databases/%s.txt' % page2)
-    bnode1, bnode2 = btr1.root, btr2.root
-    block1 = img1.crop((bnode1.left, bnode1.top, bnode1.right, bnode1.bottom))
-    block2 = img2.crop((bnode2.left, bnode2.top, bnode2.right, bnode2.bottom))
-    print block1.size, block2.size
-
-    ps = 0.0
-    # TODO: calculate page similarity
-    
-    return ps
+    '''
+    Similar to treeEditDistance
+    Calculate page similarity between two pages' block trees
+        https://github.com/timtadh/zhang-shasha/
+    @param page1:     {String} the first page's file path
+    @param page2:     {String} the second page's file path
+    @return:         {Integer} page similarity
+    '''
+    def builupTree(root):
+        tree = zss.Node(root.info)
+        for child in root.children:
+            tree.addkid(builupTree(child))
+        return tree
+    pass # def builupTree(root)
+    return zss.simple_distance(builupTree(BlockTree.parseBlockTreeFromFile(page1).root), \
+                               builupTree(BlockTree.parseBlockTreeFromFile(page2).root))
 pass # def pageSimilarity(btr1, btr2)
 
 def readData(files):
@@ -309,7 +312,11 @@ def process(files, data):
     fResult.close()
 pass # def process(files, data)
 
-def updateBlockTree():
+def updateBlockTree1():
+    '''
+    Update the block tree TXT file
+    set info to NCD between the render block and white image with same size
+    '''
     pngs, btrs = os.listdir('databases/PNG/'), os.listdir('databases/BTREE/')
     pngs.sort()
     btrs.sort()
@@ -320,7 +327,8 @@ def updateBlockTree():
         lines = []
         f = open('databases/BTREE/%s' % btr, 'r')
         for line in f:
-            lines.append(line.split(';')[0])
+            if len(line.strip()) != 0:
+                lines.append(line.split('; ')[0])
         f.close()
         img0 = Image.open('databases/PNG/%s.png' % btr[:-4])
         f = open('databases/BTREE/%s' % btr, 'w')
@@ -329,20 +337,60 @@ def updateBlockTree():
                 f.write('%s\n' % line)
                 continue
             pass # if line.startswith('================')
-            ncd = 1.0
+            ncd = ''
             try:
                 top, left, right, bottom = [int(x) for x in re.split('\D+', line)[1:]]
                 img0.crop((left, top, right, bottom)).save('databases/tmp-img1.png')
-                Image.new('RGB', ((right - left, bottom - top)), '#FFF').save('databases/tmp-img2.png')
-                ncd = fileNCD('databases/tmp-img1.png', 'databases/tmp-img2.png')
+                Image.new('RGB', (right - left, bottom - top), '#FFF').save('databases/tmp-img2.png')
+                ncd = '%f' % fileNCD('databases/tmp-img1.png', 'databases/tmp-img2.png')
             except:
+                ncd = ''.join(random.SystemRandom().choice(string.uppercase + string.lowercase + string.digits) \
+                                                            for _ in xrange(32))
                 pass
             pass # try - except
-            f.write('%s; %f\n' % (line, ncd))
+            f.write('%s; %s\n' % (line, ncd))
         f.close()
         pass # for line in lines
     pass # for i, btr in enumerate(btrs)
-pass # def updateBlockTree()
+pass # def updateBlockTree1()
+
+def updateBlockTree2():
+    '''
+    Update the block tree TXT file
+    set info to base64 string of the render block image
+    '''
+    pngs, btrs = os.listdir('databases/PNG/'), os.listdir('databases/BTREE/')
+    pngs.sort()
+    btrs.sort()
+    number = len(btrs)
+    assert number == len(pngs)
+    for i, btr in enumerate(btrs):
+        print '%4d/%4d %s' % (i, number, btr)
+        lines = []
+        f = open('databases/BTREE/%s' % btr, 'r')
+        for line in f:
+            lines.append(line.split('; ')[0])
+        f.close()
+        img = Image.open('databases/PNG/%s.png' % btr[:-4])
+        f = open('databases/BTREE/%s' % btr, 'w')
+        for line in lines:
+            if line.startswith('================'):
+                f.write('%s\n' % line)
+                continue
+            pass # if line.startswith('================')
+            txt = ''
+            try:
+                top, left, right, bottom = [int(x) for x in re.split('\D+', line)[1:]]
+                img.crop((left, top, right, bottom)).save('databases/tmp-img.png')
+                txt = base64.b64encode(open('databases/tmp-img.png', 'rb').read())
+            except:
+                pass
+            pass # try - except
+            f.write('%s; \'%s\'\n' % (line, txt))
+        f.close()
+        pass # for line in lines
+    pass # for i, btr in enumerate(btrs)
+pass # def updateBlockTree2()
 
 
 if __name__ == '__main__':
@@ -353,8 +401,12 @@ if __name__ == '__main__':
     # File statistics: file size, compressed size and file name (URL)
     #fileStatistics()
     # Update Block Trees, set info to NCD
-    updateBlockTree()
+    #updateBlockTree1()
+    # Update Block Trees, set info to base64
+    updateBlockTree2()
     exit(0)
+
+
 
     files = os.listdir('databases/PNG/')
     files.sort()
@@ -364,9 +416,11 @@ if __name__ == '__main__':
     for i, f in enumerate(files):
         for j in range(i + 1, number):
             step = {}
-#             step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
-#             step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
-#             step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+            # First run: calculate NCD, TED and HISTOs
+            step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
+            step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
+            step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+            # Second run: calculate SimLay only
             step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
             print '%4d, %4d / %4d' % (i, j, number)
             fResult.write('%d,%d:%s\n' % (i, j, step))
