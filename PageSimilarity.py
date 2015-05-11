@@ -384,7 +384,8 @@ def updateBlockTree2():
                 img.crop((left, top, right, bottom)).save('databases/tmp-img.png')
                 txt = base64.b64encode(open('databases/tmp-img.png', 'rb').read())
             except:
-                pass
+                txt = ''.join(random.SystemRandom().choice(string.uppercase + string.lowercase + string.digits) \
+                                                            for _ in xrange(32))
             pass # try - except
             f.write('%s; \'%s\'\n' % (line, txt))
         f.close()
