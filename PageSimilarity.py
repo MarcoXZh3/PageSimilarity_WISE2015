@@ -224,8 +224,12 @@ def pageSimilarity(page1, page2):
             tree.addkid(builupTree(child))
         return tree
     pass # def builupTree(root)
-    return zss.simple_distance(builupTree(BlockTree.parseBlockTreeFromFile(page1).root), \
-                               builupTree(BlockTree.parseBlockTreeFromFile(page2).root))
+    insert_cost = lambda node: 1
+    remove_cost = lambda node: 1
+    update_cost = lambda a, b: 1
+    return zss.distance(builupTree(BlockTree.parseBlockTreeFromFile(page1).root), \
+                        builupTree(BlockTree.parseBlockTreeFromFile(page2).root), \
+                        zss.Node.get_children, insert_cost, remove_cost, update_cost)
 pass # def pageSimilarity(btr1, btr2)
 
 def readData(files):
@@ -408,7 +412,7 @@ if __name__ == '__main__':
 
     files = os.listdir('databases/PNG/')
     files.sort()
-    files = [f[:-4] for f in files][:500]
+    files = [f[:-4] for f in files][:5]
     number = len(files)
     fResult = open('databases/results-PageSimNCD.txt', 'w')
     for i, f in enumerate(files):
