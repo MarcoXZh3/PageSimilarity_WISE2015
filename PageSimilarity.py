@@ -412,9 +412,9 @@ if __name__ == '__main__':
 
     files = os.listdir('databases/PNG/')
     files.sort()
-    files = [f[:-4] for f in files][:5]
+    files = [f[:-4] for f in files][:500]
     number = len(files)
-    fResult = open('databases/results-PageSimNCD.txt', 'w')
+    fResult = open('databases/results-PageSimB64.txt', 'w')
     for i, f in enumerate(files):
         for j in range(i + 1, number):
             step = {}
@@ -424,11 +424,11 @@ if __name__ == '__main__':
 #             step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
 #             # Second run: calculate SimLay only
 #             step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
-#             # Third run: calculate PageSimilarity
-#             step['pageSim-base64'] = pageSimilarity('databases/BTREE-BASE64/%s.txt' % f, \
-#                                                     'databases/BTREE-BASE64/%s.txt' % files[j])
-            step['pageSim-ncd'] = pageSimilarity('databases/BTREE-NCD/%s.txt' % f, \
-                                                 'databases/BTREE-NCD/%s.txt' % files[j])
+            # Third run: calculate PageSimilarity
+            step['pageSim-base64'] = pageSimilarity('databases/BTREE-BASE64/%s.txt' % f, \
+                                                    'databases/BTREE-BASE64/%s.txt' % files[j])
+#             step['pageSim-ncd'] = pageSimilarity('databases/BTREE-NCD/%s.txt' % f, \
+#                                                  'databases/BTREE-NCD/%s.txt' % files[j])
             print '%4d, %4d / %4d' % (i, j, number)
             fResult.write('%d,%d:%s\n' % (i, j, step))
     pass # for - for
