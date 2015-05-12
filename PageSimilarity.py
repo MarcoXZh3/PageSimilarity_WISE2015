@@ -404,25 +404,27 @@ if __name__ == '__main__':
     # Update Block Trees, set info to NCD
     #updateBlockTree1()
     # Update Block Trees, set info to base64
-    updateBlockTree2()
-    exit(0)
-
-
+    #updateBlockTree2()
 
     files = os.listdir('databases/PNG/')
     files.sort()
-    files = [f[:-4] for f in files]
+    files = [f[:-4] for f in files][:500]
     number = len(files)
-    fResult = open('databases/results.txt', 'w')
+    fResult = open('databases/results-PageSimNCD.txt', 'w')
     for i, f in enumerate(files):
         for j in range(i + 1, number):
             step = {}
-            # First run: calculate NCD, TED and HISTOs
-            step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
-            step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
-            step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
-            # Second run: calculate SimLay only
-            step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
+#             # First run: calculate NCD, TED and HISTOs
+#             step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
+#             step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
+#             step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+#             # Second run: calculate SimLay only
+#             step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
+#             # Third run: calculate PageSimilarity
+#             step['pageSim-base64'] = pageSimilarity('databases/BTREE-BASE64/%s.txt' % f, \
+#                                                     'databases/BTREE-BASE64/%s.txt' % files[j])
+            step['pageSim-ncd'] = pageSimilarity('databases/BTREE-NCD/%s.txt' % f, \
+                                                 'databases/BTREE-NCD/%s.txt' % files[j])
             print '%4d, %4d / %4d' % (i, j, number)
             fResult.write('%d,%d:%s\n' % (i, j, step))
     pass # for - for
