@@ -410,27 +410,29 @@ if __name__ == '__main__':
     # Update Block Trees, set info to base64
     #updateBlockTree2()
 
-    files = os.listdir('databases/PNG/')
-    files.sort()
-    files = [f[:-4] for f in files][:500]
-    number = len(files)
-    fResult = open('databases/results-PageSimB64.txt', 'w')
-    for i, f in enumerate(files):
-        for j in range(i + 1, number):
-            step = {}
-#             # First run: calculate NCD, TED and HISTOs
-#             step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
-#             step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
-#             step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
-#             # Second run: calculate SimLay only
-#             step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
-            # Third run: calculate PageSimilarity
-            step['pageSim-base64'] = pageSimilarity('databases/BTREE-BASE64/%s.txt' % f, \
-                                                    'databases/BTREE-BASE64/%s.txt' % files[j])
-#             step['pageSim-ncd'] = pageSimilarity('databases/BTREE-NCD/%s.txt' % f, \
-#                                                  'databases/BTREE-NCD/%s.txt' % files[j])
-            print '%4d, %4d / %4d' % (i, j, number)
-            fResult.write('%d,%d:%s\n' % (i, j, step))
-    pass # for - for
-    fResult.close()
+    for idx in range(10):
+        files = os.listdir('databases/subset%02d/' % (idx + 1))
+        files.sort()
+        files = [f[:-4] for f in files]
+        number = len(files)
+        fResult = open('databases/subset%02d/results-PageSimNCD-%02d.txt' % (idx+1, idx+1), 'w')
+        for i, f in enumerate(files):
+            for j in range(i + 1, number):
+                step = {}
+    #             # First run: calculate NCD, TED and HISTOs
+    #             step['ncd'] = fileNCD('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j])
+    #             step['ted'] = treeEditDistance('databases/TXT/%s.txt' % f, 'databases/TXT/%s.txt' % files[j])
+    #             step['hist'] = histogramDistance('databases/HISTO/%s.txt' % f, 'databases/HISTO/%s.txt' % files[j])
+    #             # Second run: calculate SimLay only
+    #             step['simlay'] = simLay('databases/PNG/%s.png' % f, 'databases/PNG/%s.png' % files[j], 4)
+                # Third run: calculate PageSimilarity
+    #             step['pageSim-base64'] = pageSimilarity('databases/BTREE-BASE64/%s.txt' % f, \
+    #                                                     'databases/BTREE-BASE64/%s.txt' % files[j])
+                step['pageSim-ncd'] = pageSimilarity('databases/BTREE-NCD/%s.txt' % f, \
+                                                     'databases/BTREE-NCD/%s.txt' % files[j])
+                print '%4d, %4d / %4d - %2d' % (i, j, number, idx)
+                fResult.write('%d,%d:%s\n' % (i, j, step))
+        pass # for - for
+        fResult.close()
+    pass # for idx in range(10)
 pass # if __name__ == '__main__'
