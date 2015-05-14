@@ -94,93 +94,138 @@ def splitSubsets(urls, subsets):
     pass # for i, subset in enumerate(subsets)
 pass # def splitSubsets(urls, subsets)
 
-def retrieveResults():
-    '''
-    Retrieve data from the Results500.txt file
-    '''
-    row = []
-    while len(row) < 500:
-        row.append(None)
-    data = []
-    while len(data) < 500:
-        data.append(row[:])
-
-    f = open('E:\\databases\\Results500.txt', 'r')
-    for line in f:
-        if len(line.strip()) == 0:
-            continue
-        d = line.strip().split()
-        data[int(d[0])][int(d[1])] = [float(x) for x in d[2:]]
-    pass # for line in f
-    f.close()
-    return data
-pass # def retrieveResults()
-
-def genSubsetLabels(urls, subsets, data):
+def genSubsetLabels(index):
     '''
     Generate the label records for training set
     '''
-    files = {}
-    for i, url in enumerate(urls):
-        files[url.replace(':', '%3A').replace('/', '%E2') + '.png'] = i
-    subrow = []
-    while len(subrow) < 50:
-        subrow.append(None)
-    for i, subset in enumerate(subsets):
-        # Initial data matrix for each subset
-        subdata = []
-        while len(subdata) < 50:
-            subdata.append(subrow[:])
-        # Fill corresponding data into the matrix, and set the classification label to 'NO'
-        for j in range(50):
-            for k in range(j + 1, 50):
-                subdata[j][k] = data[subset[j]][subset[k]]
-                subdata[j][k].append('N0')
-        pass # for - for
-#         for j, sd in enumerate(subdata):
-#             txt = ''
-#             for k, d in enumerate(sd):
-#                 txt += ('nl ' if d is None else d[-1] + ' ')
-#                 if j >= k:
-#                     assert d is None
-#             print txt
-#         pass # for sd in subdata
-        # For those similar web pages, change their classification label to 'YES'
-        path = 'E:\\databases\\subset%02d' % (i + 1)
-        dirs = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
-        for d in dirs:
-            fs = os.listdir(d)
-            idxs = [files[f] for f in fs]
-            idxs.sort()
-            for j in range(len(idxs)):
-                for k in range(j + 1, len(idxs)):
-                    subdata[j][k][-1] = 'YES'
-            pass # for -for
-        pass # for d in dirs
-        # Save the subdata to file
-        f = open('%s/subset%02d-TS.txt' % (path, i + 1), 'w')
-        for j in range(50):
-            for k in range(j + 1, 50):
-                assert subdata[j][k] is not None
-                f.write('%d\t%d\t%s\n' % (j, k, subdata[j][k]))
-        pass # for - for
-        f.close()
-    pass # for i, subset in enumerate(subsets)
-pass # def genSubsetLabels(urls, subsets, data)
+    row = []
+    while len(row) < 50:
+        row.append(None)
+    data = []
+    while len(data) < 50:
+        data.append(row[:])
 
-def classificationNB():
+    # Read data from file and build up matrix, set initial label to 'NO'
+    if not os.path.exists('E:\\databases\\results-PageSimNCD-%02d.txt' % (index+1)):
+        return
+    f = open('E:\\databases\\results-PageSimNCD-%02d.txt' % (index+1), 'r')
+    for line in f:
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        line = line.split()
+        data[int(line[0])][int(line[1])] = [int(line[2]), 'NO']
+    pass # for line in f
+    f.close()
+#     for i, r in enumerate(data):
+#         txt = ''
+#         for j, d in enumerate(r):
+#             if i >= j:
+#                 assert d is None
+#                 txt += 'nl '
+#             else:
+#                 assert len(d) == 2
+#                 txt += d[-1] + ' '
+#         # for - if
+#         print txt
+#     pass # for i, r in enumerate(data)
+
+    files = []
+    path = 'E:\\databases\\subset%02d' % (index+1)
+    for root, dirs, filenames in os.walk(path):
+        for filename in filenames:
+            files.append(filename)
+    pass # for - for
+    files.sort()
+    mapping = {}
+    for i, f in enumerate(files):
+        mapping[f] = i
+    # Update related labels to 'YES'
+    dirs = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+    for d in dirs:
+        fs = os.listdir(d)
+        fs.sort()
+        for i, f1 in enumerate(fs):
+            for j, f2 in enumerate(fs):
+                if i >= j:
+                    continue
+                data[mapping[f1]][mapping[f2]][-1] = 'YES'
+        pass # for - for
+    pass # for d in dirs
+
+    # Save results to file
+    f = open('E:\\databases\\classification%02d.txt' % (index+1), 'w')
+    f.write('i\tj\tNCD%02d\tCAT%02d\n' % (index+1, index+1))
+    for i in range(50):
+        for j in range(i+1, 50):
+            f.write('%d\t%d\t%08d\t%s\n' % (i, j, data[i][j][0], data[i][j][1]))
+    pass # for - for
+    f.close()
+pass # def genSubsetLabels(index)
+
+def classificationNB(index):
+    '''
+    Train the Naive Bayes classifier and classify data
+    naiveBayesClassifier is used.
+    https://github.com/muatik/naive-bayes-classifier
+    '''
+    # Initial training set from file
+    trainset = []
+    f = open('E:\\databases\\trainset.txt', 'r')
+    for line in f:
+        if len(line.strip()) == 0:
+            continue
+        line = line.strip().split()
+        assert len(line) == 22
+        trainset.append({'text': '%08d' % int(line[(index+1)*2]), 'category': line[(index+1)*2+1]})
+    pass # for line in f
+    f.close()
+
+    # Train the classifier
+    trainer = Trainer(tokenizer)
+    for case in trainset:
+        trainer.train(case['text'], case['category'])
+    classifier = Classifier(trainer.data, tokenizer)
+
+    # Classification for each of the rest sets
     for i in range(10):
-        pass
+        if index == i:
+            continue
+        print '%-2d ~ %-2d' % (index, i)
+        # Read cases from the file and classify each case
+        f = open('E:\\databases\\classification%02d.txt' % (i + 1), 'r')
+        results = []
+        count = 0
+        for line in f:
+            count += 1
+            line = line.strip()
+            if len(line) == 0:
+                continue
+            if count == 1:              # the first line -- title
+                header = 'CAT%02d' % (index+1)
+                assert header not in line
+                results.append('%s\t%s' % (line, header))
+                continue
+            pass # if count == 1
+            case = line.split()
+            assert len(case) >= 4
+            clf = classifier.classify(case[2])
+            results.append('%s\t%s' % (line, clf))
+        pass # for line in f
+        f.close()
+
+        # Save the results back to the file
+        f = open('E:\\databases\\classification%02d.txt' % (i + 1), 'w')
+        for re in results:
+            f.write('%s\n' % re)
+        f.close()
     pass # for i in range(10)
-# 
-#     trainer = Trainer(tokenizer)
-#     
-#     trainset = []
+
 pass # def classificationNB()
 
 
 if __name__ == '__main__':
-    urls = retrieveURLs('E:\\databases/PNG500/')
+#    urls = retrieveURLs('E:\\databases/PNG500/')
 #     for i, url in enumerate(urls):
 #         print i, url
 #     pass # for i, url in enumerate(urls)
@@ -240,6 +285,12 @@ if __name__ == '__main__':
               ]
 #     splitSubsets(urls, subsets)
 
-    data = retrieveResults()
-    genSubsetLabels(urls, subsets, data)
+    for i in range(10):
+        genSubsetLabels(i)
+    pass # for i in range(10)
+
+    for i in range(10):
+        classificationNB(i)
+    pass # for i in range(10):
+
 pass # if __name__ == '__main__'
