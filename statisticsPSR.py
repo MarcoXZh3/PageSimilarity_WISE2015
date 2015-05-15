@@ -223,8 +223,7 @@ def classificationNB(index):
 
 pass # def classificationNB()
 
-
-if __name__ == '__main__':
+def processData():
 #    urls = retrieveURLs('E:\\databases/PNG500/')
 #     for i, url in enumerate(urls):
 #         print i, url
@@ -292,5 +291,46 @@ if __name__ == '__main__':
     for i in range(10):
         classificationNB(i)
     pass # for i in range(10):
+pass # def processData()
 
+def reshapeData(index, base):
+    f = open('E:\\databases\\trainset.txt', 'r')
+    data = []
+    for line in f:
+        line = line.strip()
+        if len(line) == 0 or line.startswith('i\tj'):
+            continue
+        line = line.split()
+        assert len(line) == 22
+        txt = ''
+        if base == 2:
+            txt = '{0:016b}'.format(int(line[(index+1)*2]))
+        elif base == 10:
+            txt = '%04d' % int(line[(index+1)*2])
+        elif base == 16:
+            txt = '%03X' % int(line[(index+1)*2])
+        pass # elif - elif -if
+        txt = '\t'.join((line[0], line[1], '\t'.join(txt), line[(index+1)*2+1]))
+        data.append(txt)
+    pass # for line in f
+    f.close()
+    f = open('E:\\databases\\classification%02d.txt' % (index+1), 'w')
+    if base == 2:
+        f.write('i\tj\td01\td02\td03\td04\td05\td06\td07\td08\td09' + \
+                '\td10\td11\td12\td13\td14\td15\td16\tCAT%02d\n' % (index+1))
+    elif base == 10:
+        f.write('i\tj\td01\td02\td03\td04\tCAT%02d\n' % (index+1))
+    elif base == 16:
+        f.write('i\tj\td01\td02\td03\tCAT%02d\n' % (index+1))
+    pass # elif - elif -if
+    for d in data:
+        f.write('%s\n' % d)
+    f.close()
+pass # def reshapeData(index)
+
+
+if __name__ == '__main__':
+    base = 2
+    for i in range(10):
+        reshapeData(i, base)
 pass # if __name__ == '__main__'

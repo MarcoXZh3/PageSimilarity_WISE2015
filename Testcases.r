@@ -1,0 +1,5 @@
+data <- read.csv("Testcases.txt", sep="\t", header=FALSE)
+svg("Testcases.svg", width=16, height=5, pointsize=28, family="Serif")
+par(mar=c(0, 2, 0, 0))
+hist(data$V1, breaks=220, col="black", main="", xlab="", ylab="", xlim=c(0, 220), ylim=c(0, 70), xaxt='n')
+dev.off()
