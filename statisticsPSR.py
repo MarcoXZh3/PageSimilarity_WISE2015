@@ -75,7 +75,10 @@ def testcaseHistogram(domains):
         pass # while i < len(domains[k])
         index += 2
     pass # for k in domains
-    return data
+    f = open('databases/TestcaseDistributions.txt', 'w')
+    for d in data:
+        f.write('%d\n' % d)
+    f.close()
 pass # def testcaseHistogram(domains)
 
 def splitSubsets(urls, subsets):
@@ -330,6 +333,13 @@ pass # def reshapeData(index)
 
 
 if __name__ == '__main__':
+    # Count the domain distribution of the test cases
+#     urls = []
+#     for i in range(10):
+#         urls += retrieveURLs('databases/subset%02d' % (i + 1))
+#     pass # for in range(10)
+#     testcaseHistogram(countDomains(urls))
+
     base = 2
     for i in range(10):
         reshapeData(i, base)
