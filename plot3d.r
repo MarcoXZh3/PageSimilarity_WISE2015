@@ -44,7 +44,7 @@ for (i in c(8, 10)) {
                   xlab='', ylab='', zlab='', angle=30, mar=c(2.5,3,0,0));
     par(new=TRUE);
     scatterplot3d(x2, y2, no, main='', pch=20, xlim=c(0, 50), ylim=c(0, 50), zlim=c(0, 1600),
-                  xlab=sprintf('Subset %d', i), ylab='', zlab=sprintf('%40s', 'NCD'), angle=30, mar=c(2.5,3,0,0));
+                  xlab=sprintf('Subset %d', i), ylab='', zlab=sprintf('%40s', 'TED'), angle=30, mar=c(2.5,3,0,0));
     legend(6.5, 5.8, pch=c(4, 20), c('YES', 'NO'));
     par(new=FALSE);
 } # for (i in 1:numbers)
