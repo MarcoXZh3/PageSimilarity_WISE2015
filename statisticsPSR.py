@@ -377,6 +377,29 @@ def findBackPreClassifications(index):
     return groups
 pass # def findBackPreClassifications(index)
 
+def countTreeSize():
+    data = []
+    for i in range(10):
+        files = os.listdir('databases/subset%02d' % (i+1))
+        files.sort()
+        subset = []
+        for f in files:
+            txt = open('databases/BTREE-NCD/%s.txt' % f[:-4], 'r')
+            number = 0
+            for line in txt:
+                if line.startswith('===='):
+                    break
+                number += 1
+            pass # for line in txt
+            txt.close()
+            subset.append(number)
+        pass # for f in files
+        assert len(subset) == 50
+        data.append(subset)
+    pass # for i in range(10)
+    return data
+pass # def countTreeSize()
+
 
 if __name__ == '__main__':
     # Count the domain distribution of the test cases
@@ -385,6 +408,14 @@ if __name__ == '__main__':
 #         urls += retrieveURLs('databases/subset%02d' % (i + 1))
 #     pass # for in range(10)
 #     testcaseHistogram(countDomains(urls))
+
+    # Count block tree size
+#     data = []
+#     for d in countTreeSize():
+#         print d
+#         data += d 
+#     for d in data:
+#         print d
 
     base = 2
     for i in range(10):
