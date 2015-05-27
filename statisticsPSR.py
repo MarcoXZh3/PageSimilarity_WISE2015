@@ -331,6 +331,52 @@ def reshapeData(index, base):
     f.close()
 pass # def reshapeData(index)
 
+def findBackPreClassifications(index):
+    f = open('E:\\databases\\trainset.txt', 'r')
+    groups = []
+    for line in f:
+        line = line.strip()
+        if len(line) == 0 or line.startswith('i\tj'):
+            continue
+        line = line.split()
+        idx1, idx2, cat = int(line[0]), int(line[1]), line[2*(index+1)+1]
+        if cat == 'YES':
+            gIdx = 0
+            for g in groups:
+                if idx1 in g:
+                    g.add(idx2)
+                    break
+                pass # if idx1 in g
+                gIdx += 1
+            pass # for g in groups
+            if gIdx == len(groups):
+                groups.append(set([idx1, idx2]))
+    pass # for line in f
+    f.close()
+
+    # Add those groups containing only one page
+    for i in range(50):
+        gIdx = 0
+        for g in groups:
+            if i in g:
+                break
+            gIdx += 1
+        pass # for g in groups
+        if gIdx == len(groups):
+            groups.append(set([i]))
+    pass # for i in range(50)
+
+    # Prepare for returning the groups
+    length = 0
+    for i, g in enumerate(groups):
+        length += len(g)
+        groups[i] = list(g)
+        groups[i].sort()
+    pass # for i, g in enumerate(groups)
+    assert length == 50
+    return groups
+pass # def findBackPreClassifications(index)
+
 
 if __name__ == '__main__':
     # Count the domain distribution of the test cases
@@ -343,4 +389,22 @@ if __name__ == '__main__':
     base = 2
     for i in range(10):
         reshapeData(i, base)
+
+    # Restore Pre-classifications
+#     results = []
+#     for i in range(10):
+#         groups = findBackPreClassifications(i)
+#         reSubset = []
+#         print 'Subset%02d' % (i+1)
+#         for g in groups:
+#             print g
+#             reSubset.append(len(g))
+#         pass # for g in groups
+#         print
+#         results.append(reSubset)
+#     pass # for i in range(10)
+#     print '\nGroup lengths of each subset'
+#     for i, re in enumerate(results):
+#         print 'Subset%02d: %s' % (i+1, re)
+
 pass # if __name__ == '__main__'
