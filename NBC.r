@@ -26,8 +26,10 @@ for (i in 1:numbers) {
         pred <- as.data.frame(predict(classifier, alldata[[j]][,3:cols-1]));
         alldata[[j]][[sprintf('PRED%02d', i)]] <- as.vector(pred[,1]);
     } # for (j in 1:numbers)
+    #View(alldata[[i]])
+    write.table(alldata[[i]], sprintf('classification%02d.txt', i), sep='\t',
+                col.names=TRUE, row.names=FALSE, quote=FALSE);
 } # for (i in 1:numbers)
-#View(alldata[[numbers]])
 
 # Evaluate the precision, recall and F-1 score
 results <- matrix(ncol=9, nrow=numbers);
