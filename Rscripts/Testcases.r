@@ -8,8 +8,8 @@ loadfonts()
 
 
 # Test case distribution
-#pdf('Testcases.pdf', width=8, height=5, pointsize=32, family='CMU Serif')
-svg('Testcases.svg', width=8, height=5, pointsize=32, family='CMU Serif')
+#pdf('TestCaseDistribution.pdf', width=8, height=5, pointsize=32, family='CMU Serif')
+svg('TestCaseDistribution.svg', width=8, height=5, pointsize=32, family='CMU Serif')
 data <- read.csv('TestcaseDistributions.txt', sep='\t', header=FALSE)
 par(mar=c(1, 3, 0.5, 0.5))
 hist(data$V1, breaks=220, col='black', main='', xlim=c(0, 220), ylim=c(0, 80), xaxt='n')
