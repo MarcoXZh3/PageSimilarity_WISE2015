@@ -8,11 +8,11 @@ font_import()
 loadfonts()
 
 
-#pdf('TEDDistribution.pdf', width=16, height=12, pointsize=22, family='CMU Serif')
-svg('TEDDistribution.svg', width=16, height=12, pointsize=22, family='CMU Serif')
+#pdf('TEDDistribution.pdf', width=16, height=12, pointsize=24, family='CMU Serif')
+svg('TEDDistribution.svg', width=16, height=12, pointsize=24, family='CMU Serif')
 
 m <- rbind(c(1, 2), c(3, 4), c(5, 6), c(7, 8), c(9, 10))
-m <- rbind(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9), c(11, 10, 12))
+#m <- rbind(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9), c(11, 10, 12))
 layout(m)
 
 # Read all data
